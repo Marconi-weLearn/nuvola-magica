@@ -24,9 +24,11 @@ hs_err_pid*
 #intelliJ IDEA files
 .idea/
 *.iml
-/target/
 
 #eclipse
 .classpath
 .project
 .settings
+
+# Build files
+target/
