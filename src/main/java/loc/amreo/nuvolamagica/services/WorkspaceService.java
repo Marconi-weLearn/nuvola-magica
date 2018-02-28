@@ -19,10 +19,13 @@ public class WorkspaceService {
 	private WorkspaceRepository workspaceRepository;
 	
 	public UUID createWorkspace() {
-		UUID uuid = UUID.randomUUID();
-		//TODO: the repository should be queryied and updated
-		workspaceRepository.save(new Workspace(uuid));
+		Workspace ws = new Workspace();
+		workspaceRepository.save(ws);
 		//TODO: the registry should be notified of the new UUID
-		return uuid;
+		return ws.getId();
+	}
+	
+	public Boolean isWorkspaceExisting(UUID workspaceID) {
+		return workspaceRepository.countWorkspaceByid(workspaceID) > 0;
 	}
 }

@@ -20,5 +20,12 @@ public class Workspace {
 	}
 	public Workspace() {
 		super();
+
+	}
+	public UUID getId() {
+		return id;
+	}
+	public void setId(UUID id) {
+		this.id = id;
 	}
 }
