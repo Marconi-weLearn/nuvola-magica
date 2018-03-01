@@ -62,4 +62,22 @@ public class SessionService {
 			return false;
 		}
 	}
+	
+	public boolean deleteSession(UUID workspaceID, UUID sessionID) {
+		if (isSessionExisting(workspaceID, sessionID)) {
+			sessionRepository.deleteSessionByidAndWorkspaceID(sessionID, workspaceID);
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean deleteSessions(UUID workspaceID) {
+		if (workspaceService.isWorkspaceExisting(workspaceID)) {
+			sessionRepository.deleteAllSessionByWorkspaceID(workspaceID);
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
