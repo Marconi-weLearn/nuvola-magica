@@ -1,16 +1,14 @@
 package loc.amreo.nuvolamagica.services;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Optional;
 import java.util.UUID;
-import static java.lang.Math.max;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
+import loc.amreo.nuvolamagica.containerbackend.ContainerProxy;
 import loc.amreo.nuvolamagica.repositories.Session;
 import loc.amreo.nuvolamagica.repositories.SessionRepository;
 
@@ -21,6 +19,8 @@ public class SessionService {
 	private WorkspaceService workspaceService;
 	@Autowired
 	private SessionRepository sessionRepository;
+	@Autowired
+	private ContainerProxy containerProxy;
 	
 	@Value("${nuvolamagica.session.max_session_time:28800}")
 	private int MAX_SESSION_TIME; 
@@ -42,7 +42,7 @@ public class SessionService {
 			ss.setWorkspaceID(workspaceID);
 			ss.setTimeoutDate(calculateTimeoutDate(LocalDateTime.now()));
 			sessionRepository.save(ss);
-			//TODO: Notify the container manager of the new session
+			containerProxy.notifySessionOpening(workspaceID, ss.getId());
 			return Optional.of(ss.getId());
 		} else {
 			return Optional.empty();
@@ -65,6 +65,7 @@ public class SessionService {
 	
 	public boolean deleteSession(UUID workspaceID, UUID sessionID) {
 		if (isSessionExisting(workspaceID, sessionID)) {
+			containerProxy.notifySessionClosing(workspaceID, sessionID);
 			sessionRepository.deleteSessionByidAndWorkspaceID(sessionID, workspaceID);
 			return true;
 		} else {
@@ -74,6 +75,7 @@ public class SessionService {
 	
 	public boolean deleteSessions(UUID workspaceID) {
 		if (workspaceService.isWorkspaceExisting(workspaceID)) {
+			containerProxy.notifySessionClosing(workspaceID);
 			sessionRepository.deleteAllSessionByWorkspaceID(workspaceID);
 			return true;
 		} else {

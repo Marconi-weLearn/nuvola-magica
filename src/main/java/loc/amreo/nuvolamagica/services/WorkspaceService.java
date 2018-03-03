@@ -5,7 +5,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import loc.amreo.nuvolamagica.repositories.SessionRepository;
+import loc.amreo.nuvolamagica.containerbackend.ContainerProxy;
 import loc.amreo.nuvolamagica.repositories.Workspace;
 import loc.amreo.nuvolamagica.repositories.WorkspaceRepository;
 
@@ -13,8 +13,8 @@ import loc.amreo.nuvolamagica.repositories.WorkspaceRepository;
 @Service
 public class WorkspaceService {
 	
-	//@Autowired
-	//private ContainerRegistry containerRegistry;
+	@Autowired
+	private ContainerProxy containerProxy;
 	
 	@Autowired
 	private SessionService sessionService;
@@ -26,7 +26,7 @@ public class WorkspaceService {
 	public UUID createWorkspace() {
 		Workspace ws = new Workspace();
 		workspaceRepository.save(ws);
-		//TODO: the registry should be notified of the new UUID
+		containerProxy.notifyWorkspaceCreation(ws.getId());
 		return ws.getId();
 	}
 	
@@ -36,7 +36,7 @@ public class WorkspaceService {
 
 	public boolean deleteWorkspace(UUID workspaceID) {
 		if (isWorkspaceExisting(workspaceID)) {
-			//NOTIFY the container registry
+			containerProxy.notifyWorkspaceDeletion(workspaceID);
 			sessionService.deleteSessions(workspaceID);
 			workspaceRepository.deleteWorkspaceByid(workspaceID);
 			return true;

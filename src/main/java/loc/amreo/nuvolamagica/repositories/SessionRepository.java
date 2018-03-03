@@ -16,5 +16,4 @@ public interface SessionRepository extends JpaRepository<Session, UUID>{
 	public void deleteSessionByidAndWorkspaceID(UUID ID, UUID workspaceID);
 	@Transactional
 	public void deleteAllSessionByWorkspaceID(UUID workspaceID);
-
 }
