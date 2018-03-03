@@ -9,4 +9,10 @@ import loc.amreo.nuvolamagica.containerbackend.CommunicationDriver;
 @ConditionalOnExpression("'${nuvolamagica.communication.driver:SSH}'=='SSH'")
 public class SSHCommunicationDriver implements CommunicationDriver {
 
+	@Override
+	public void upload(String communicationEndpoint, String filename, byte[] content) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

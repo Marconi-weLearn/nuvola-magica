@@ -15,7 +15,7 @@ public interface ContainerProxy {
 	public void notifySessionClosing(UUID workspaceID);
 	public void notifyWorkspaceDeletion(UUID workspaceID);
 
-	public void uploadFile(UUID workspaceID, UUID sessionID, String filename, Byte[] content);
+	public void uploadFile(UUID workspaceID, UUID sessionID, String filename, byte[] content);
 	public void deleteFile(UUID workspaceID, UUID sessionID, String filename);
 	public byte[] getFile(UUID workspaceID, UUID sessionID, String filename);	
 	

@@ -72,9 +72,10 @@ public class OneWorkspaceToOneContainerProxy implements ContainerProxy{
 		containerInfoRepository.deleteAllByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
 	}
 	@Override
-	public void uploadFile(UUID workspaceID, UUID sessionID, String filename, Byte[] content) {
-		// TODO Auto-generated method stub
-		
+	public void uploadFile(UUID workspaceID, UUID sessionID, String filename, byte[] content) {
+		//Get communication endpoint of the container
+		ContainerInfo info = containerInfoRepository.findOneByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
+		communicationDriver.upload(info.getCommunicationEndpoint(), workspaceID+"/"+filename, content);
 	}
 	@Override
 	public void deleteFile(UUID workspaceID, UUID sessionID, String filename) {
