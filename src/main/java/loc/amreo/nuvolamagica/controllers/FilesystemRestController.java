@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,6 +56,21 @@ public class FilesystemRestController {
 		//Delete the file
 		if (filesystemService.delete(workspaceID, sessionID, filename)) {
 			return ResponseEntity.ok().build();
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+	}
+	
+	@GetMapping(path="/workspace/{workspaceID}/sessions/{sessionID}/files/**")
+	ResponseEntity<byte[]> getFile(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, HttpServletRequest request) {
+		//Get file name
+		String filename = new AntPathMatcher()
+	            .extractPathWithinPattern( "/workspace/{workspaceID}/sessions/{sessionID}/files/**", request.getRequestURI() );
+		//I don't know why but the filename start with files/.
+		filename = filename.replaceFirst("files/", "");
+		//Delete the file
+		if (filesystemService.exist(workspaceID, sessionID, filename)) {
+			return ResponseEntity.ok(filesystemService.get(workspaceID, sessionID, filename));
 		} else {
 			return ResponseEntity.notFound().build();
 		}

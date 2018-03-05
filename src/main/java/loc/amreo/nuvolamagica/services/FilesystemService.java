@@ -33,4 +33,17 @@ public class FilesystemService {
 		}
 	}
 
+	public boolean exist(UUID workspaceID, UUID sessionID, String filename) {
+		if (sessionService.isSessionExisting(workspaceID, sessionID)) {
+			return containerProxy.existFile(workspaceID, sessionID, filename);
+		} else {
+			return false;
+		}
+	}
+
+	public byte[] get(UUID workspaceID, UUID sessionID, String filename) {
+		//The method assume that it's called with valid workspaceID and sessionID, and the file exist
+		return containerProxy.getFile(workspaceID, sessionID, filename);
+	}
+
 }

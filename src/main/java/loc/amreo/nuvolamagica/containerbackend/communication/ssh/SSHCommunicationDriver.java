@@ -21,4 +21,16 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 		
 	}
 
+	@Override
+	public boolean existFile(String communicationEndpoint, String filename) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public byte[] getFile(String communicationEndpoint, String filename) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

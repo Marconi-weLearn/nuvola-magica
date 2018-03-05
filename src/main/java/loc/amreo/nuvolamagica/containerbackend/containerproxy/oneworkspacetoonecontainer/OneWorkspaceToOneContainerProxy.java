@@ -81,9 +81,16 @@ public class OneWorkspaceToOneContainerProxy implements ContainerProxy{
 		communicationDriver.deleteFile(info.getCommunicationEndpoint(), workspaceID+"/"+filename);
 	}
 	@Override
+	public boolean existFile(UUID workspaceID, UUID sessionID, String filename) {
+		//Get communication endpoint of the container
+		ContainerInfo info = containerInfoRepository.findOneByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
+		return communicationDriver.existFile(info.getCommunicationEndpoint(), workspaceID+"/"+filename);
+	}
+	@Override
 	public byte[] getFile(UUID workspaceID, UUID sessionID, String filename) {
-		// TODO Auto-generated method stub
-		return null;
+		//Get communication endpoint of the container
+		ContainerInfo info = containerInfoRepository.findOneByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
+		return communicationDriver.getFile(info.getCommunicationEndpoint(), workspaceID+"/"+filename);	
 	}
 	@Override
 	public CompilationResponse compile(UUID workspaceID, UUID sessionID, CompilationRequest compilationRequest) {
@@ -120,6 +127,4 @@ public class OneWorkspaceToOneContainerProxy implements ContainerProxy{
 		// TODO Auto-generated method stub
 		
 	}
-
-	
 }

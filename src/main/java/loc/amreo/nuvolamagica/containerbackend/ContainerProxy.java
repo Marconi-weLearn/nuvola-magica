@@ -17,6 +17,7 @@ public interface ContainerProxy {
 
 	public void uploadFile(UUID workspaceID, UUID sessionID, String filename, byte[] content);
 	public void deleteFile(UUID workspaceID, UUID sessionID, String filename);
+	public boolean existFile(UUID workspaceID, UUID sessionID, String filename);
 	public byte[] getFile(UUID workspaceID, UUID sessionID, String filename);	
 	
 	public CompilationResponse compile(UUID workspaceID, UUID sessionID, CompilationRequest compilationRequest);
@@ -26,4 +27,5 @@ public interface ContainerProxy {
 	public void pushStdin(UUID processID, Byte[] content);
 	public ProcessStatusResponse getProcessStatus(UUID processID);
 	public void sendSignal(UUID processID, SignalProcessRequest signalInfo);
+
 }
