@@ -10,7 +10,13 @@ import loc.amreo.nuvolamagica.containerbackend.CommunicationDriver;
 public class SSHCommunicationDriver implements CommunicationDriver {
 
 	@Override
-	public void upload(String communicationEndpoint, String filename, byte[] content) {
+	public void uploadFile(String communicationEndpoint, String filename, byte[] content) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteFile(String communicationEndpoint, String filename) {
 		// TODO Auto-generated method stub
 		
 	}

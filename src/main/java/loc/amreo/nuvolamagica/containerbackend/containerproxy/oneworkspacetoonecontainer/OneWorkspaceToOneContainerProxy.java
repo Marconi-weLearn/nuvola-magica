@@ -8,9 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 
-import com.oracle.webservices.internal.api.message.PropertySet.Property;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
-
 import loc.amreo.nuvolamagica.containerbackend.CommunicationDriver;
 import loc.amreo.nuvolamagica.containerbackend.ContainerManager;
 import loc.amreo.nuvolamagica.containerbackend.ContainerProxy;
@@ -75,12 +72,13 @@ public class OneWorkspaceToOneContainerProxy implements ContainerProxy{
 	public void uploadFile(UUID workspaceID, UUID sessionID, String filename, byte[] content) {
 		//Get communication endpoint of the container
 		ContainerInfo info = containerInfoRepository.findOneByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
-		communicationDriver.upload(info.getCommunicationEndpoint(), workspaceID+"/"+filename, content);
+		communicationDriver.uploadFile(info.getCommunicationEndpoint(), workspaceID+"/"+filename, content);
 	}
 	@Override
 	public void deleteFile(UUID workspaceID, UUID sessionID, String filename) {
-		// TODO Auto-generated method stub
-		
+		//Get communication endpoint of the container
+		ContainerInfo info = containerInfoRepository.findOneByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
+		communicationDriver.deleteFile(info.getCommunicationEndpoint(), workspaceID+"/"+filename);
 	}
 	@Override
 	public byte[] getFile(UUID workspaceID, UUID sessionID, String filename) {

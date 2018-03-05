@@ -24,4 +24,13 @@ public class FilesystemService {
 		}
 	}
 
+	public boolean delete(UUID workspaceID, UUID sessionID, String filename) {
+		if (sessionService.isSessionExisting(workspaceID, sessionID)) {
+			containerProxy.deleteFile(workspaceID, sessionID, filename);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 }

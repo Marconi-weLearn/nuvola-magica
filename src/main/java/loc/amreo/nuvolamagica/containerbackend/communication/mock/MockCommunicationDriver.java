@@ -12,9 +12,12 @@ import loc.amreo.nuvolamagica.containerbackend.CommunicationDriver;
 public class MockCommunicationDriver implements CommunicationDriver {
 
 	@Override
-	public void upload(String communicationEndpoint, String filename, byte[] content) {
+	public void uploadFile(String communicationEndpoint, String filename, byte[] content) {
 		System.out.println("[MockCommunicationDriver][upload] I think I've uploaded the file " + filename + " with content: " + new String(content, StandardCharsets.UTF_8) + " to " + communicationEndpoint);
 	}
 
-	
+	@Override
+	public void deleteFile(String communicationEndpoint, String filename) {
+		System.out.println("[MockCommunicationDriver][delete] I think I've deleted the file " + filename + " to " + communicationEndpoint);
+	}	
 }
