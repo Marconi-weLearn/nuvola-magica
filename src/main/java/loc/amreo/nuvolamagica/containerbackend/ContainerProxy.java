@@ -20,7 +20,7 @@ public interface ContainerProxy {
 	public boolean existFile(UUID workspaceID, UUID sessionID, String filename);
 	public byte[] getFile(UUID workspaceID, UUID sessionID, String filename);	
 	
-	public CompilationResponse compile(UUID workspaceID, UUID sessionID, CompilationRequest compilationRequest);
+	public CompilationResponse build(UUID workspaceID, UUID sessionID, CompilationRequest compilationRequest);
 	public UUID execute(UUID workspaceID, UUID sessionID, ExecutionRequest executionRequest);
 	public Byte[] pullStdout(UUID processID);
 	public Byte[] pullStderr(UUID processID);

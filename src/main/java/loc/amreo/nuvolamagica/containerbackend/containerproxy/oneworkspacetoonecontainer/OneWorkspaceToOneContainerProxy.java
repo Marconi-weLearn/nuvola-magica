@@ -93,9 +93,11 @@ public class OneWorkspaceToOneContainerProxy implements ContainerProxy{
 		return communicationDriver.getFile(info.getCommunicationEndpoint(), workspaceID+"/"+filename);	
 	}
 	@Override
-	public CompilationResponse compile(UUID workspaceID, UUID sessionID, CompilationRequest compilationRequest) {
-		// TODO Auto-generated method stub
-		return null;
+	public CompilationResponse build(UUID workspaceID, UUID sessionID, CompilationRequest compilationRequest) {
+		//Get communication endpoint of the container
+		ContainerInfo info = containerInfoRepository.findOneByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
+		compilationRequest.setChrootDir(workspaceID+"/"+compilationRequest.getChrootDir());
+		return communicationDriver.build(info.getCommunicationEndpoint(), compilationRequest);	
 	}
 	@Override
 	public UUID execute(UUID workspaceID, UUID sessionID, ExecutionRequest executionRequest) {

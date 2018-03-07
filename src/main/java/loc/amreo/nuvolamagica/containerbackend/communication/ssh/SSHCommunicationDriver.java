@@ -4,6 +4,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 
 import loc.amreo.nuvolamagica.containerbackend.CommunicationDriver;
+import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.CompilationRequest;
+import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.CompilationResponse;
 
 @Service
 @ConditionalOnExpression("'${nuvolamagica.communication.driver:SSH}'=='SSH'")
@@ -29,6 +31,12 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 
 	@Override
 	public byte[] getFile(String communicationEndpoint, String filename) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompilationResponse build(String communicationEndpoint, CompilationRequest compilationRequest) {
 		// TODO Auto-generated method stub
 		return null;
 	}

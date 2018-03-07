@@ -6,6 +6,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 
 import loc.amreo.nuvolamagica.containerbackend.CommunicationDriver;
+import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.CompilationRequest;
+import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.CompilationResponse;
 
 @Service
 @ConditionalOnExpression("'${nuvolamagica.communication.driver}'=='mock'")
@@ -31,5 +33,12 @@ public class MockCommunicationDriver implements CommunicationDriver {
 	public byte[] getFile(String communicationEndpoint, String filename) {
 		System.out.println("[MockCommunicationDriver][getFile] I think I've downloaded the file " + filename + " from " + communicationEndpoint);	
 		return "The secret content".getBytes(); //I don't know why the content of the file is always this. Maybe I return a constant?
+	}
+
+	@Override
+	public CompilationResponse build(String communicationEndpoint, CompilationRequest compilationRequest) {
+		System.out.println("[MockCommunicationDriver][build] I think I've built the project " + 
+				compilationRequest.getLangType() + " in " + compilationRequest.getChrootDir() + " @" + communicationEndpoint);	
+		return new CompilationResponse(0, " The project is built sucessfull but I don't know why.");
 	}
 }
