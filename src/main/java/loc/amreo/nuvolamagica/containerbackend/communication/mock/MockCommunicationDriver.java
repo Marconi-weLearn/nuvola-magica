@@ -1,6 +1,7 @@
 package loc.amreo.nuvolamagica.containerbackend.communication.mock;
 
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import loc.amreo.nuvolamagica.containerbackend.CommunicationDriver;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.CompilationRequest;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.CompilationResponse;
+import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ExecutionRequest;
 
 @Service
 @ConditionalOnExpression("'${nuvolamagica.communication.driver}'=='mock'")
@@ -40,5 +42,12 @@ public class MockCommunicationDriver implements CommunicationDriver {
 		System.out.println("[MockCommunicationDriver][build] I think I've built the project " + 
 				compilationRequest.getLangType() + " in " + compilationRequest.getChrootDir() + " @" + communicationEndpoint);	
 		return new CompilationResponse(0, " The project is built sucessfull but I don't know why.");
+	}
+
+	@Override
+	public UUID startExecution(String communicationEndpoint, ExecutionRequest compilationRequest) {
+		System.out.println("[MockCommunicationDriver][startExecution] I think I've started the process " + 
+				compilationRequest.getLangType() + " in " + compilationRequest.getChrootDir() + " @" + communicationEndpoint);	
+		return new UUID(666,666);
 	}
 }

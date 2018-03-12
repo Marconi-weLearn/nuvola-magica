@@ -1,5 +1,4 @@
 package loc.amreo.nuvolamagica.containerbackend.containerproxy.oneworkspacetoonecontainer;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 
@@ -28,7 +27,6 @@ public class OneWorkspaceToOneContainerProxy implements ContainerProxy{
 	private ContainerManager containerManager;
 	@Autowired
 	private CommunicationDriver communicationDriver;
-	private HashMap<UUID, ProcessInfo> processMap;
 	@Value("${nuvolamagica.container.proxy.container_name_prefix:nuvola-magica-bem-}")
 	private String CONTAINER_NAME_PREFIX;
 	
@@ -101,8 +99,10 @@ public class OneWorkspaceToOneContainerProxy implements ContainerProxy{
 	}
 	@Override
 	public UUID execute(UUID workspaceID, UUID sessionID, ExecutionRequest executionRequest) {
-		// TODO Auto-generated method stub
-		return null;
+		//Get communication endpoint of the container
+		ContainerInfo info = containerInfoRepository.findOneByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
+		executionRequest.setChrootDir(workspaceID+"/"+executionRequest.getChrootDir());
+		return communicationDriver.startExecution(info.getCommunicationEndpoint(), executionRequest);		
 	}
 	@Override
 	public Byte[] pullStdout(UUID processID) {
