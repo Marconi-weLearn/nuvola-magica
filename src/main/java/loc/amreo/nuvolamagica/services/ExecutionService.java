@@ -33,4 +33,11 @@ public class ExecutionService {
 		}
 	}
 
+	public Optional<byte[]> pullProcessStderr(UUID workspaceID, UUID sessionID, UUID processID) {
+		if (sessionService.isSessionExisting(workspaceID, sessionID)) {
+			return Optional.of(containerProxy.pullStderr(workspaceID, sessionID, processID));
+		} else {
+			return Optional.empty();
+		}
+	}
 }

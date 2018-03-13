@@ -46,11 +46,20 @@ public class BuildAndExecuteRestController {
 	}
 	
 	@GetMapping("/api/workspace/{workspaceID}/sessions/{sessionID}/processes/{processID}/stdout")
-	public ResponseEntity<byte[]> startExecution(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @PathVariable("processID") UUID processID) {
+	public ResponseEntity<byte[]> getProcessStdout(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @PathVariable("processID") UUID processID) {
 		Optional<byte[]> out = executionService.pullProcessStdout(workspaceID, sessionID, processID);
 		
 		return out
 				.map(stdout -> ResponseEntity.ok(stdout))
+				.orElseGet(() -> ResponseEntity.notFound().build());	
+	}
+	
+	@GetMapping("/api/workspace/{workspaceID}/sessions/{sessionID}/processes/{processID}/stderr")
+	public ResponseEntity<byte[]> getProcessStderr(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @PathVariable("processID") UUID processID) {
+		Optional<byte[]> out = executionService.pullProcessStderr(workspaceID, sessionID, processID);
+		
+		return out
+				.map(stderr -> ResponseEntity.ok(stderr))
 				.orElseGet(() -> ResponseEntity.notFound().build());	
 	}
 }

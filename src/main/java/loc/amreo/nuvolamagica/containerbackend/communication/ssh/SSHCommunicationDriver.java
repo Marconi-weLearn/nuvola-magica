@@ -22,7 +22,7 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 
 	@Override
 	public void deleteFile(String communicationEndpoint, String filename) {
-		// TODO Auto-generated method stub
+		// TODO Auto-generated method sterroring ub
 		
 	}
 
@@ -52,6 +52,12 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 
 	@Override
 	public byte[] pullProcessStdout(String communicationEndpoint, UUID processID) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public byte[] pullProcessStderr(String communicationEndpoint, UUID processID) {
 		// TODO Auto-generated method stub
 		return null;
 	}

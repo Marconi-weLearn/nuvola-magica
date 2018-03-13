@@ -56,4 +56,10 @@ public class MockCommunicationDriver implements CommunicationDriver {
 		System.out.println("[MockCommunicationDriver][pullProcessStdout] I think I've getted the stdout of " + processID + " from " + communicationEndpoint);	
 		return "The most verbose content".getBytes(); //I don't know why the content of the file is always this. Maybe I return a constant?
 	}
+	
+	@Override
+	public byte[] pullProcessStderr(String communicationEndpoint, UUID processID) {
+		System.out.println("[MockCommunicationDriver][pullProcessStderr] I think I've getted the stderr of " + processID + " from " + communicationEndpoint);	
+		return "The most wrong content".getBytes(); //I don't know why the content of the file is always this. Maybe I return a constant?
+	}
 }
