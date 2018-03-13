@@ -11,6 +11,7 @@ import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.CompilationRequ
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.CompilationResponse;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ExecutionRequest;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ProcessStatusResponse;
+import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.SignalProcessRequest;
 
 @Service
 @ConditionalOnExpression("'${nuvolamagica.communication.driver}'=='mock'")
@@ -73,5 +74,10 @@ public class MockCommunicationDriver implements CommunicationDriver {
 	public ProcessStatusResponse getProcessStatus(String communicationEndpoint, UUID processID) {
 		System.out.println("[MockCommunicationDriver][getProcessStatus] I think the process " + processID + "is running from " + communicationEndpoint);	
 		return new ProcessStatusResponse(-666, "Maybe Running");
+	}
+
+	@Override
+	public void sendSignalToProcess(String communicationEndpoint, UUID processID, SignalProcessRequest signalInfo) {
+		System.out.println("[MockCommunicationDriver][sendSignalToProcess] I think the process " + processID + "has received the signal:" + signalInfo.getSignalCode() + " from " + communicationEndpoint);			
 	}
 }

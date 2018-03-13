@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import loc.amreo.nuvolamagica.containerbackend.ContainerProxy;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ExecutionRequest;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ProcessStatusResponse;
+import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.SignalProcessRequest;
 
 @Service
 public class ExecutionService {
@@ -56,6 +57,15 @@ public class ExecutionService {
 			return Optional.of(containerProxy.getProcessStatus(workspaceID, sessionID, processID));
 		} else {
 			return Optional.empty();
+		}
+	}
+
+	public boolean signalProcess(UUID workspaceID, UUID sessionID, UUID processID, SignalProcessRequest request) {
+		if (sessionService.isSessionExisting(workspaceID, sessionID)) {
+			containerProxy.sendSignal(workspaceID, sessionID, processID, request);
+			return true;
+		} else {
+			return false;
 		}
 	}
 }

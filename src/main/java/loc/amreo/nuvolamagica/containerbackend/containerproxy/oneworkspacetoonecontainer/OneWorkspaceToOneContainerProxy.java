@@ -130,7 +130,8 @@ public class OneWorkspaceToOneContainerProxy implements ContainerProxy{
 	}
 	@Override
 	public void sendSignal(UUID workspaceID, UUID sessionID, UUID processID, SignalProcessRequest signalInfo) {
-		// TODO Auto-generated method stub
-		
+		//Get communication endpoint of the container
+		ContainerInfo info = containerInfoRepository.findOneByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
+		communicationDriver.sendSignalToProcess(info.getCommunicationEndpoint(), processID, signalInfo);		
 	}
 }

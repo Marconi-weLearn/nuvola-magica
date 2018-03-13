@@ -10,6 +10,7 @@ import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.CompilationRequ
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.CompilationResponse;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ExecutionRequest;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ProcessStatusResponse;
+import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.SignalProcessRequest;
 
 @Service
 @ConditionalOnExpression("'${nuvolamagica.communication.driver:SSH}'=='SSH'")
@@ -73,6 +74,12 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 	public ProcessStatusResponse getProcessStatus(String communicationEndpoint, UUID processID) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void sendSignalToProcess(String communicationEndpoint, UUID processID, SignalProcessRequest signalInfo) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
