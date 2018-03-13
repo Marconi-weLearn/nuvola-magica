@@ -50,4 +50,10 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 		return null;
 	}
 
+	@Override
+	public byte[] pullProcessStdout(String communicationEndpoint, UUID processID) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

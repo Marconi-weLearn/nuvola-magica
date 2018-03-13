@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,7 +41,16 @@ public class BuildAndExecuteRestController {
 		Optional<UUID> out = executionService.startProcess(workspaceID, sessionID, request);
 		
 		return out
-				.map(er -> ResponseEntity.ok(new ExecutionResponse("/api/workspace/"+workspaceID+"/sessions/"+sessionID + "/processes"+er)))
+				.map(er -> ResponseEntity.ok(new ExecutionResponse("/api/workspace/"+workspaceID+"/sessions/"+sessionID + "/processes/"+er)))
+				.orElseGet(() -> ResponseEntity.notFound().build());	
+	}
+	
+	@GetMapping("/api/workspace/{workspaceID}/sessions/{sessionID}/processes/{processID}/stdout")
+	public ResponseEntity<byte[]> startExecution(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @PathVariable("processID") UUID processID) {
+		Optional<byte[]> out = executionService.pullProcessStdout(workspaceID, sessionID, processID);
+		
+		return out
+				.map(stdout -> ResponseEntity.ok(stdout))
 				.orElseGet(() -> ResponseEntity.notFound().build());	
 	}
 }

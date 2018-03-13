@@ -14,5 +14,6 @@ public interface CommunicationDriver {
 	byte[] getFile(String communicationEndpoint, String filename);
 	CompilationResponse build(String communicationEndpoint, CompilationRequest compilationRequest);
 	UUID startExecution(String communicationEndpoint, ExecutionRequest compilationRequest);
+	byte[] pullProcessStdout(String communicationEndpoint, UUID processID);
 
 }

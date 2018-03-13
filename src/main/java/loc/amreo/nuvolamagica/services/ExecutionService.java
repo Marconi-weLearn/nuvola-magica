@@ -25,4 +25,12 @@ public class ExecutionService {
 		}
 	}
 
+	public Optional<byte[]> pullProcessStdout(UUID workspaceID, UUID sessionID, UUID processID) {
+		if (sessionService.isSessionExisting(workspaceID, sessionID)) {
+			return Optional.of(containerProxy.pullStdout(workspaceID, sessionID, processID));
+		} else {
+			return Optional.empty();
+		}
+	}
+
 }

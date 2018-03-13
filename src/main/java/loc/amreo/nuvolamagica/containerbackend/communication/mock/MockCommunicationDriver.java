@@ -50,4 +50,10 @@ public class MockCommunicationDriver implements CommunicationDriver {
 				compilationRequest.getLangType() + " in " + compilationRequest.getChrootDir() + " @" + communicationEndpoint);	
 		return new UUID(666,666);
 	}
+
+	@Override
+	public byte[] pullProcessStdout(String communicationEndpoint, UUID processID) {
+		System.out.println("[MockCommunicationDriver][pullProcessStdout] I think I've getted the stdout of " + processID + " from " + communicationEndpoint);	
+		return "The most verbose content".getBytes(); //I don't know why the content of the file is always this. Maybe I return a constant?
+	}
 }

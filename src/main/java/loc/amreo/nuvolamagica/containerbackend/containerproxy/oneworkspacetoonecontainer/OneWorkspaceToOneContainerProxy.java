@@ -105,27 +105,28 @@ public class OneWorkspaceToOneContainerProxy implements ContainerProxy{
 		return communicationDriver.startExecution(info.getCommunicationEndpoint(), executionRequest);		
 	}
 	@Override
-	public Byte[] pullStdout(UUID processID) {
+	public byte[] pullStdout(UUID workspaceID, UUID sessionID,UUID processID) {
+		//Get communication endpoint of the container
+		ContainerInfo info = containerInfoRepository.findOneByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
+		return communicationDriver.pullProcessStdout(info.getCommunicationEndpoint(), processID);		
+	}
+	@Override
+	public byte[] pullStderr(UUID workspaceID, UUID sessionID,UUID processID) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
-	public Byte[] pullStderr(UUID processID) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public void pushStdin(UUID processID, Byte[] content) {
+	public void pushStdin(UUID workspaceID, UUID sessionID, UUID processID, byte[] content) {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public ProcessStatusResponse getProcessStatus(UUID processID) {
+	public ProcessStatusResponse getProcessStatus(UUID workspaceID, UUID sessionID,UUID processID) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
-	public void sendSignal(UUID processID, SignalProcessRequest signalInfo) {
+	public void sendSignal(UUID workspaceID, UUID sessionID, UUID processID, SignalProcessRequest signalInfo) {
 		// TODO Auto-generated method stub
 		
 	}
