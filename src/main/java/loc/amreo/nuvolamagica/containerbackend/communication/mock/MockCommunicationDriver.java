@@ -10,6 +10,7 @@ import loc.amreo.nuvolamagica.containerbackend.CommunicationDriver;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.CompilationRequest;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.CompilationResponse;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ExecutionRequest;
+import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ProcessStatusResponse;
 
 @Service
 @ConditionalOnExpression("'${nuvolamagica.communication.driver}'=='mock'")
@@ -66,5 +67,11 @@ public class MockCommunicationDriver implements CommunicationDriver {
 	@Override
 	public void pushProcessStdin(String communicationEndpoint, UUID processID, byte[] content) {
 		System.out.println("[MockCommunicationDriver][pushProcessStdin] I think I've pushed the content to the process " + processID + " with content: " + new String(content, StandardCharsets.UTF_8) + " to " + communicationEndpoint);
+	}
+
+	@Override
+	public ProcessStatusResponse getProcessStatus(String communicationEndpoint, UUID processID) {
+		System.out.println("[MockCommunicationDriver][getProcessStatus] I think the process " + processID + "is running from " + communicationEndpoint);	
+		return new ProcessStatusResponse(-666, "Maybe Running");
 	}
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import loc.amreo.nuvolamagica.containerbackend.ContainerProxy;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ExecutionRequest;
+import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ProcessStatusResponse;
 
 @Service
 public class ExecutionService {
@@ -47,6 +48,14 @@ public class ExecutionService {
 			return true;
 		} else {
 			return false;
+		}
+	}
+	
+	public Optional<ProcessStatusResponse> getProcessStatus(UUID workspaceID, UUID sessionID, UUID processID) {
+		if (sessionService.isSessionExisting(workspaceID, sessionID)) {
+			return Optional.of(containerProxy.getProcessStatus(workspaceID, sessionID, processID));
+		} else {
+			return Optional.empty();
 		}
 	}
 }

@@ -19,6 +19,7 @@ import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.CompilationRequ
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.CompilationResponse;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ExecutionRequest;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ExecutionResponse;
+import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ProcessStatusResponse;
 import loc.amreo.nuvolamagica.services.BuildService;
 import loc.amreo.nuvolamagica.services.ExecutionService;
 
@@ -78,5 +79,12 @@ public class BuildAndExecuteRestController {
 		} else {
 			return ResponseEntity.notFound().build();
 		}
+	}
+	
+	@GetMapping("/api/workspace/{workspaceID}/sessions/{sessionID}/processes/{processID}/status")
+	public ResponseEntity<ProcessStatusResponse> getProcessStatus(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @PathVariable("processID") UUID processID) {
+		return executionService.getProcessStatus(workspaceID, sessionID, processID)
+				.map(status -> ResponseEntity.ok(status))
+				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
 }

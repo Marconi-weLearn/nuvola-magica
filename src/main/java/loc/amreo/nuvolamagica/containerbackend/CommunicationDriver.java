@@ -5,6 +5,7 @@ import java.util.UUID;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.CompilationRequest;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.CompilationResponse;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ExecutionRequest;
+import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ProcessStatusResponse;
 
 public interface CommunicationDriver {
 
@@ -17,5 +18,6 @@ public interface CommunicationDriver {
 	byte[] pullProcessStdout(String communicationEndpoint, UUID processID);
 	byte[] pullProcessStderr(String communicationEndpoint, UUID processID);
 	void pushProcessStdin(String communicationEndpoint, UUID processID, byte[] content);
+	ProcessStatusResponse getProcessStatus(String communicationEndpoint, UUID processID);
 
 }
