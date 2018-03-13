@@ -16,5 +16,6 @@ public interface CommunicationDriver {
 	UUID startExecution(String communicationEndpoint, ExecutionRequest compilationRequest);
 	byte[] pullProcessStdout(String communicationEndpoint, UUID processID);
 	byte[] pullProcessStderr(String communicationEndpoint, UUID processID);
+	void pushProcessStdin(String communicationEndpoint, UUID processID, byte[] content);
 
 }

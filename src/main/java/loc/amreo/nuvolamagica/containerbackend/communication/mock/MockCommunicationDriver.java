@@ -62,4 +62,9 @@ public class MockCommunicationDriver implements CommunicationDriver {
 		System.out.println("[MockCommunicationDriver][pullProcessStderr] I think I've getted the stderr of " + processID + " from " + communicationEndpoint);	
 		return "The most wrong content".getBytes(); //I don't know why the content of the file is always this. Maybe I return a constant?
 	}
+
+	@Override
+	public void pushProcessStdin(String communicationEndpoint, UUID processID, byte[] content) {
+		System.out.println("[MockCommunicationDriver][pushProcessStdin] I think I've pushed the content to the process " + processID + " with content: " + new String(content, StandardCharsets.UTF_8) + " to " + communicationEndpoint);
+	}
 }

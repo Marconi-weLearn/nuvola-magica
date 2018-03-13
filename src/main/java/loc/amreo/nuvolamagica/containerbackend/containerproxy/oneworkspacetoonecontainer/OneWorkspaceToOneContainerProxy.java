@@ -118,8 +118,9 @@ public class OneWorkspaceToOneContainerProxy implements ContainerProxy{
 	}
 	@Override
 	public void pushStdin(UUID workspaceID, UUID sessionID, UUID processID, byte[] content) {
-		// TODO Auto-generated method stub
-		
+		//Get communication endpoint of the container
+		ContainerInfo info = containerInfoRepository.findOneByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
+		communicationDriver.pushProcessStdin(info.getCommunicationEndpoint(), processID, content);	
 	}
 	@Override
 	public ProcessStatusResponse getProcessStatus(UUID workspaceID, UUID sessionID,UUID processID) {

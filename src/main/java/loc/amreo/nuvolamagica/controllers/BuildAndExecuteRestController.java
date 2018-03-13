@@ -1,13 +1,17 @@
 package loc.amreo.nuvolamagica.controllers;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -56,10 +60,23 @@ public class BuildAndExecuteRestController {
 	
 	@GetMapping("/api/workspace/{workspaceID}/sessions/{sessionID}/processes/{processID}/stderr")
 	public ResponseEntity<byte[]> getProcessStderr(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @PathVariable("processID") UUID processID) {
-		Optional<byte[]> out = executionService.pullProcessStderr(workspaceID, sessionID, processID);
+		Optional<byte[]> err = executionService.pullProcessStderr(workspaceID, sessionID, processID);
 		
-		return out
+		return err
 				.map(stderr -> ResponseEntity.ok(stderr))
 				.orElseGet(() -> ResponseEntity.notFound().build());	
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@PutMapping("/api/workspace/{workspaceID}/sessions/{sessionID}/processes/{processID}/stdin")
+	public ResponseEntity pushProcessStdin(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @PathVariable("processID") UUID processID, InputStream stream) throws IOException {
+		//Get stream content
+		byte[] content = IOUtils.toByteArray(stream);
+		
+		if (executionService.pushProcessStdin(workspaceID, sessionID, processID, content)) {
+			return ResponseEntity.ok().build();
+		} else {
+			return ResponseEntity.notFound().build();
+		}
 	}
 }

@@ -40,4 +40,13 @@ public class ExecutionService {
 			return Optional.empty();
 		}
 	}
+
+	public boolean pushProcessStdin(UUID workspaceID, UUID sessionID, UUID processID, byte[] content) {
+		if (sessionService.isSessionExisting(workspaceID, sessionID)) {
+			containerProxy.pushStdin(workspaceID, sessionID, processID, content);
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

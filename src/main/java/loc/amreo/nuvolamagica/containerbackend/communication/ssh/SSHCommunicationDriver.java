@@ -62,4 +62,10 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 		return null;
 	}
 
+	@Override
+	public void pushProcessStdin(String communicationEndpoint, UUID processID, byte[] content) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
