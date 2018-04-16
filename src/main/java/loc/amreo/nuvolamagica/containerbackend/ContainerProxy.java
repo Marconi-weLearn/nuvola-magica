@@ -20,12 +20,12 @@ public interface ContainerProxy {
 	public boolean existFile(UUID workspaceID, UUID sessionID, String filename);
 	public byte[] getFile(UUID workspaceID, UUID sessionID, String filename);	
 	
-	public CompilationResponse compile(UUID workspaceID, UUID sessionID, CompilationRequest compilationRequest);
+	public CompilationResponse build(UUID workspaceID, UUID sessionID, CompilationRequest compilationRequest);
 	public UUID execute(UUID workspaceID, UUID sessionID, ExecutionRequest executionRequest);
-	public Byte[] pullStdout(UUID processID);
-	public Byte[] pullStderr(UUID processID);
-	public void pushStdin(UUID processID, Byte[] content);
-	public ProcessStatusResponse getProcessStatus(UUID processID);
-	public void sendSignal(UUID processID, SignalProcessRequest signalInfo);
+	public byte[] pullStdout(UUID workspaceID, UUID sessionID,UUID processID);
+	public byte[] pullStderr(UUID workspaceID, UUID sessionID,UUID processID);
+	public void pushStdin(UUID workspaceID, UUID sessionID,UUID processID, byte[] content);
+	public ProcessStatusResponse getProcessStatus(UUID workspaceID, UUID sessionID,UUID processID);
+	public void sendSignal(UUID workspaceID, UUID sessionID, UUID processID, SignalProcessRequest signalInfo);
 
 }

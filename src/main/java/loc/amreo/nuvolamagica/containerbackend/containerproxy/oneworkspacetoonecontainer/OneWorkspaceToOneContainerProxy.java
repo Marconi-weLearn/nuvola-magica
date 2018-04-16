@@ -1,5 +1,4 @@
 package loc.amreo.nuvolamagica.containerbackend.containerproxy.oneworkspacetoonecontainer;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 
@@ -28,7 +27,6 @@ public class OneWorkspaceToOneContainerProxy implements ContainerProxy{
 	private ContainerManager containerManager;
 	@Autowired
 	private CommunicationDriver communicationDriver;
-	private HashMap<UUID, ProcessInfo> processMap;
 	@Value("${nuvolamagica.container.proxy.container_name_prefix:nuvola-magica-bem-}")
 	private String CONTAINER_NAME_PREFIX;
 	
@@ -93,38 +91,47 @@ public class OneWorkspaceToOneContainerProxy implements ContainerProxy{
 		return communicationDriver.getFile(info.getCommunicationEndpoint(), workspaceID+"/"+filename);	
 	}
 	@Override
-	public CompilationResponse compile(UUID workspaceID, UUID sessionID, CompilationRequest compilationRequest) {
-		// TODO Auto-generated method stub
-		return null;
+	public CompilationResponse build(UUID workspaceID, UUID sessionID, CompilationRequest compilationRequest) {
+		//Get communication endpoint of the container
+		ContainerInfo info = containerInfoRepository.findOneByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
+		compilationRequest.setChrootDir(workspaceID+"/"+compilationRequest.getChrootDir());
+		return communicationDriver.build(info.getCommunicationEndpoint(), compilationRequest);	
 	}
 	@Override
 	public UUID execute(UUID workspaceID, UUID sessionID, ExecutionRequest executionRequest) {
-		// TODO Auto-generated method stub
-		return null;
+		//Get communication endpoint of the container
+		ContainerInfo info = containerInfoRepository.findOneByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
+		executionRequest.setChrootDir(workspaceID+"/"+executionRequest.getChrootDir());
+		return communicationDriver.startExecution(info.getCommunicationEndpoint(), executionRequest);		
 	}
 	@Override
-	public Byte[] pullStdout(UUID processID) {
-		// TODO Auto-generated method stub
-		return null;
+	public byte[] pullStdout(UUID workspaceID, UUID sessionID,UUID processID) {
+		//Get communication endpoint of the container
+		ContainerInfo info = containerInfoRepository.findOneByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
+		return communicationDriver.pullProcessStdout(info.getCommunicationEndpoint(), processID);		
 	}
 	@Override
-	public Byte[] pullStderr(UUID processID) {
-		// TODO Auto-generated method stub
-		return null;
+	public byte[] pullStderr(UUID workspaceID, UUID sessionID,UUID processID) {
+		//Get communication endpoint of the container
+		ContainerInfo info = containerInfoRepository.findOneByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
+		return communicationDriver.pullProcessStderr(info.getCommunicationEndpoint(), processID);		
 	}
 	@Override
-	public void pushStdin(UUID processID, Byte[] content) {
-		// TODO Auto-generated method stub
-		
+	public void pushStdin(UUID workspaceID, UUID sessionID, UUID processID, byte[] content) {
+		//Get communication endpoint of the container
+		ContainerInfo info = containerInfoRepository.findOneByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
+		communicationDriver.pushProcessStdin(info.getCommunicationEndpoint(), processID, content);	
 	}
 	@Override
-	public ProcessStatusResponse getProcessStatus(UUID processID) {
-		// TODO Auto-generated method stub
-		return null;
+	public ProcessStatusResponse getProcessStatus(UUID workspaceID, UUID sessionID,UUID processID) {
+		//Get communication endpoint of the container
+		ContainerInfo info = containerInfoRepository.findOneByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
+		return communicationDriver.getProcessStatus(info.getCommunicationEndpoint(), processID);		
 	}
 	@Override
-	public void sendSignal(UUID processID, SignalProcessRequest signalInfo) {
-		// TODO Auto-generated method stub
-		
+	public void sendSignal(UUID workspaceID, UUID sessionID, UUID processID, SignalProcessRequest signalInfo) {
+		//Get communication endpoint of the container
+		ContainerInfo info = containerInfoRepository.findOneByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
+		communicationDriver.sendSignalToProcess(info.getCommunicationEndpoint(), processID, signalInfo);		
 	}
 }
