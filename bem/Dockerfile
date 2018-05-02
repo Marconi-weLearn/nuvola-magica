@@ -1,6 +1,6 @@
 FROM rastasheep/ubuntu-sshd:16.04
-RUN apt-get update
-RUN apt-get install openjdk-8-jdk
-RUN apt-get clean 
+RUN apt-get update && \
+    apt-get install -y openjdk-8-jdk && \
+    apt-get clean 
 EXPOSE 22
  
