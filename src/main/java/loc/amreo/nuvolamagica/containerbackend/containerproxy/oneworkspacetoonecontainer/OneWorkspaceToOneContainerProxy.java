@@ -41,7 +41,8 @@ public class OneWorkspaceToOneContainerProxy implements ContainerProxy{
 	@Override
 	public void notifySessionOpening(UUID workspaceID, UUID sessionID) {
 		ContainerInfo info = containerInfoRepository.findOneByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
-		containerManager.unpause(info.getContainerName());
+		if (info.getSessions().isEmpty())
+			containerManager.unpause(info.getContainerName());
 		info.addSession(sessionID);
 		containerInfoRepository.save(info);
 	}
@@ -57,9 +58,11 @@ public class OneWorkspaceToOneContainerProxy implements ContainerProxy{
 	@Override
 	public void notifySessionClosing(UUID workspaceID) {
 		ContainerInfo info = containerInfoRepository.findOneByContainerName(CONTAINER_NAME_PREFIX + workspaceID);
-		containerManager.pause(info.getContainerName());
-		info.setSessions(new HashSet<UUID>());
-		containerInfoRepository.save(info);		
+		if (!info.getSessions().isEmpty()) {
+			containerManager.pause(info.getContainerName());
+			info.setSessions(new HashSet<UUID>());
+			containerInfoRepository.save(info);					
+		}
 	}
 	@Override
 	public void notifyWorkspaceDeletion(UUID workspaceID) {
