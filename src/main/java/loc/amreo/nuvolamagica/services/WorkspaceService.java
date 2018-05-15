@@ -36,8 +36,8 @@ public class WorkspaceService {
 
 	public boolean deleteWorkspace(UUID workspaceID) {
 		if (isWorkspaceExisting(workspaceID)) {
-			containerProxy.notifyWorkspaceDeletion(workspaceID);
 			sessionService.deleteSessions(workspaceID);
+			containerProxy.notifyWorkspaceDeletion(workspaceID);
 			workspaceRepository.deleteWorkspaceByid(workspaceID);
 			return true;
 		} else {
