@@ -4,8 +4,14 @@ public class CompilationRequest {
 	String chrootDir;
 	String langType;
 	String options;
+	String mainFile;
 	
-	
+	public String getMainFile() {
+		return mainFile;
+	}
+	public void setMainFile(String mainFile) {
+		this.mainFile = mainFile;
+	}
 	public String getChrootDir() {
 		return chrootDir;
 	}

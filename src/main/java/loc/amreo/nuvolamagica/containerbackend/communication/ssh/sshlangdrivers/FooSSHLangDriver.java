@@ -8,15 +8,14 @@ import loc.amreo.nuvolamagica.containerbackend.communication.ssh.SSHLangDriverRe
 
 @Component
 @ConditionalOnBean(SSHLangDriverRegistry.class)
-public class JavaSSHLangDriver implements SSHLangDriver {
+public class FooSSHLangDriver implements SSHLangDriver {
 
-	public JavaSSHLangDriver(@Autowired SSHLangDriverRegistry registry) {
-		registry.registerDriver("java", this);
+	public FooSSHLangDriver(@Autowired SSHLangDriverRegistry registry) {
+		registry.registerDriver("foo", this);
 	}
 	
 	@Override
 	public String getBuildCommand(String mainFile, String options) {
-		return "javac " + options + " " + mainFile;
+		return String.format("bash -c \"echo #!/bin/bash echo %s %s >> out.sh && chmod +x out.sh \"", mainFile, options);
 	}
-
 }
