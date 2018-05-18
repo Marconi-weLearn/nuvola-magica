@@ -80,11 +80,8 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 		try {
 			//Create empty file with dire
 			Session session = conn.startSession();
-			System.out.println("mkfile " + directoryOfFiles+filename);
 			Command cmd = session.exec("mkfile " + directoryOfFiles+filename);
 			cmd.join(1, TimeUnit.SECONDS);
-			System.out.println(cmd.getExitErrorMessage());
-			System.out.println(cmd.getExitStatus());
 			
 			session.close();
 			//Upload the content of the file
@@ -115,8 +112,16 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 
 	@Override
 	public void deleteFile(String communicationEndpoint, String filename) {
-		// TODO Auto-generated method sterroring ub
-		
+		SSHClient conn = getConnection(communicationEndpoint);
+		try {
+			//Remove the file if exist
+			Session session = conn.startSession();
+			Command cmd = session.exec("rm -rf " + directoryOfFiles+filename);
+			cmd.join(1, TimeUnit.SECONDS);
+			session.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}			
 	}
 
 	@Override
