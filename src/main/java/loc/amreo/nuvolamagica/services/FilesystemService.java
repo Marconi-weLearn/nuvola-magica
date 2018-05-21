@@ -15,7 +15,7 @@ public class FilesystemService {
 	@Autowired
 	private ContainerProxy containerProxy;
 	
-	public boolean put(UUID workspaceID, UUID sessionID, String filename, byte[] content) {
+	public boolean put(UUID workspaceID, UUID sessionID, String filename, byte[] content) throws Exception {
 		if (sessionService.isSessionExisting(workspaceID, sessionID)) {
 			containerProxy.uploadFile(workspaceID, sessionID, filename, content);
 			return true;
@@ -24,7 +24,7 @@ public class FilesystemService {
 		}
 	}
 
-	public boolean delete(UUID workspaceID, UUID sessionID, String filename) {
+	public boolean delete(UUID workspaceID, UUID sessionID, String filename) throws Exception {
 		if (sessionService.isSessionExisting(workspaceID, sessionID)) {
 			containerProxy.deleteFile(workspaceID, sessionID, filename);
 			return true;
@@ -33,7 +33,7 @@ public class FilesystemService {
 		}
 	}
 
-	public boolean exist(UUID workspaceID, UUID sessionID, String filename) {
+	public boolean exist(UUID workspaceID, UUID sessionID, String filename) throws Exception {
 		if (sessionService.isSessionExisting(workspaceID, sessionID)) {
 			return containerProxy.existFile(workspaceID, sessionID, filename);
 		} else {
@@ -41,7 +41,7 @@ public class FilesystemService {
 		}
 	}
 
-	public byte[] get(UUID workspaceID, UUID sessionID, String filename) {
+	public byte[] get(UUID workspaceID, UUID sessionID, String filename) throws Exception {
 		//The method assume that it's called with valid workspaceID and sessionID, and the file exist
 		return containerProxy.getFile(workspaceID, sessionID, filename);
 	}

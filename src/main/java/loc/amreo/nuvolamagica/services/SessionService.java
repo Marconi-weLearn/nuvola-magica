@@ -36,7 +36,7 @@ public class SessionService {
 		return min(creationDate.plusSeconds(MAX_SESSION_TIME), creationDate.plusSeconds(MAX_INACTIVITY_TIME));
 	}
 	
-	public Optional<UUID> createSession(UUID workspaceID) {
+	public Optional<UUID> createSession(UUID workspaceID) throws Exception {
 		if (workspaceService.isWorkspaceExisting(workspaceID)) {
 			Session ss = new Session();
 			ss.setWorkspaceID(workspaceID);
@@ -49,11 +49,11 @@ public class SessionService {
 		}
 	}
 	
-	public boolean isSessionExisting(UUID workspaceID, UUID sessionID) {
+	public boolean isSessionExisting(UUID workspaceID, UUID sessionID) throws Exception {
 		return sessionRepository.countSessionByidAndWorkspaceID(sessionID, workspaceID) > 0;
 	}
 	
-	public boolean wakeUpSession(UUID workspaceID, UUID sessionID) {
+	public boolean wakeUpSession(UUID workspaceID, UUID sessionID) throws Exception {
 		if (isSessionExisting(workspaceID, sessionID)) {
 			Session ss = sessionRepository.findSessionByidAndWorkspaceID(sessionID, workspaceID);
 			ss.setTimeoutDate(calculateTimeoutDate(ss.getCreationDate()));
@@ -63,7 +63,7 @@ public class SessionService {
 		}
 	}
 	
-	public boolean deleteSession(UUID workspaceID, UUID sessionID) {
+	public boolean deleteSession(UUID workspaceID, UUID sessionID) throws Exception {
 		if (isSessionExisting(workspaceID, sessionID)) {
 			containerProxy.notifySessionClosing(workspaceID, sessionID);
 			sessionRepository.deleteSessionByidAndWorkspaceID(sessionID, workspaceID);
@@ -73,7 +73,7 @@ public class SessionService {
 		}
 	}
 	
-	public boolean deleteSessions(UUID workspaceID) {
+	public boolean deleteSessions(UUID workspaceID) throws Exception {
 		if (workspaceService.isWorkspaceExisting(workspaceID)) {
 			containerProxy.notifySessionClosing(workspaceID);
 			sessionRepository.deleteAllSessionByWorkspaceID(workspaceID);

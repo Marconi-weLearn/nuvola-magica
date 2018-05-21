@@ -10,23 +10,23 @@ import loc.amreo.nuvolamagica.containerbackend.ContainerManager;
 public class MockContainerManager implements ContainerManager {
 
 	@Override
-	public String createContainer(String containerName) {
+	public String createContainer(String containerName) throws Exception {
 		System.out.println("[MockContainerManager][CreateContainer] I think I've created the container: " + containerName);
 		return "127.0.0.1:" + containerName; //The TRUE RANDOM communication endpoint
 	}
 
 	@Override
-	public void pause(String containerName) {
+	public void pause(String containerName) throws Exception {
 		System.out.println("[MockContainerManager][Pause] I think I've pauesed the container: " + containerName);
 	}
 
 	@Override
-	public void unpause(String containerName) {
+	public void unpause(String containerName) throws Exception {
 		System.out.println("[MockContainerManager][Unpause] I think I've unpauesed the container: " + containerName);
 	}
 
 	@Override
-	public void destroy(String containerName) {
+	public void destroy(String containerName) throws Exception {
 		System.out.println("[MockContainerManager][Destroy] I think I've destroyed the container: " + containerName);
 	}
 

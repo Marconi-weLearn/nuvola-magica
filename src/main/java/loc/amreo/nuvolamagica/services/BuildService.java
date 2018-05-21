@@ -18,7 +18,7 @@ public class BuildService {
 		@Autowired
 		private ContainerProxy containerProxy;
 		
-		public Optional<CompilationResponse> build(UUID workspaceID, UUID sessionID, CompilationRequest request) {
+		public Optional<CompilationResponse> build(UUID workspaceID, UUID sessionID, CompilationRequest request) throws Exception {
 			if (sessionService.isSessionExisting(workspaceID, sessionID)) {
 				return Optional.of(containerProxy.build(workspaceID, sessionID, request));
 			} else {

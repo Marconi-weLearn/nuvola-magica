@@ -23,18 +23,18 @@ public class WorkspaceService {
 	private WorkspaceRepository workspaceRepository;
 	
 	
-	public UUID createWorkspace() {
+	public UUID createWorkspace() throws Exception {
 		Workspace ws = new Workspace();
 		workspaceRepository.save(ws);
 		containerProxy.notifyWorkspaceCreation(ws.getId());
 		return ws.getId();
 	}
 	
-	public Boolean isWorkspaceExisting(UUID workspaceID) {
+	public Boolean isWorkspaceExisting(UUID workspaceID) throws Exception {
 		return workspaceRepository.countWorkspaceByid(workspaceID) > 0;
 	}
 
-	public boolean deleteWorkspace(UUID workspaceID) {
+	public boolean deleteWorkspace(UUID workspaceID) throws Exception {
 		if (isWorkspaceExisting(workspaceID)) {
 			sessionService.deleteSessions(workspaceID);
 			containerProxy.notifyWorkspaceDeletion(workspaceID);

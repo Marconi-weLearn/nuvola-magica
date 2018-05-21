@@ -19,7 +19,7 @@ public class ExecutionService {
 	@Autowired
 	private ContainerProxy containerProxy;
 	
-	public Optional<UUID> startProcess(UUID workspaceID, UUID sessionID, ExecutionRequest request) {
+	public Optional<UUID> startProcess(UUID workspaceID, UUID sessionID, ExecutionRequest request) throws Exception {
 		if (sessionService.isSessionExisting(workspaceID, sessionID)) {
 			return Optional.of(containerProxy.execute(workspaceID, sessionID, request));
 		} else {
@@ -27,7 +27,7 @@ public class ExecutionService {
 		}
 	}
 
-	public Optional<byte[]> pullProcessStdout(UUID workspaceID, UUID sessionID, UUID processID) {
+	public Optional<byte[]> pullProcessStdout(UUID workspaceID, UUID sessionID, UUID processID) throws Exception {
 		if (sessionService.isSessionExisting(workspaceID, sessionID)) {
 			return Optional.of(containerProxy.pullStdout(workspaceID, sessionID, processID));
 		} else {
@@ -35,7 +35,7 @@ public class ExecutionService {
 		}
 	}
 
-	public Optional<byte[]> pullProcessStderr(UUID workspaceID, UUID sessionID, UUID processID) {
+	public Optional<byte[]> pullProcessStderr(UUID workspaceID, UUID sessionID, UUID processID) throws Exception {
 		if (sessionService.isSessionExisting(workspaceID, sessionID)) {
 			return Optional.of(containerProxy.pullStderr(workspaceID, sessionID, processID));
 		} else {
@@ -43,7 +43,7 @@ public class ExecutionService {
 		}
 	}
 
-	public boolean pushProcessStdin(UUID workspaceID, UUID sessionID, UUID processID, byte[] content) {
+	public boolean pushProcessStdin(UUID workspaceID, UUID sessionID, UUID processID, byte[] content) throws Exception {
 		if (sessionService.isSessionExisting(workspaceID, sessionID)) {
 			containerProxy.pushStdin(workspaceID, sessionID, processID, content);
 			return true;
@@ -52,7 +52,7 @@ public class ExecutionService {
 		}
 	}
 	
-	public Optional<ProcessStatusResponse> getProcessStatus(UUID workspaceID, UUID sessionID, UUID processID) {
+	public Optional<ProcessStatusResponse> getProcessStatus(UUID workspaceID, UUID sessionID, UUID processID) throws Exception {
 		if (sessionService.isSessionExisting(workspaceID, sessionID)) {
 			return Optional.of(containerProxy.getProcessStatus(workspaceID, sessionID, processID));
 		} else {
@@ -60,7 +60,7 @@ public class ExecutionService {
 		}
 	}
 
-	public boolean signalProcess(UUID workspaceID, UUID sessionID, UUID processID, SignalProcessRequest request) {
+	public boolean signalProcess(UUID workspaceID, UUID sessionID, UUID processID, SignalProcessRequest request) throws Exception {
 		if (sessionService.isSessionExisting(workspaceID, sessionID)) {
 			containerProxy.sendSignal(workspaceID, sessionID, processID, request);
 			return true;
