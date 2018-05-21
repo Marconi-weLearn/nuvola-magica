@@ -1,6 +1,5 @@
 package loc.amreo.nuvolamagica.controllers;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,7 +32,7 @@ public class BuildAndExecuteRestController {
 	private ExecutionService executionService;
 	
 	@PostMapping("/api/workspace/{workspaceID}/sessions/{sessionID}/compilation")
-	public ResponseEntity<CompilationResponse> compile(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @RequestBody CompilationRequest request) {
+	public ResponseEntity<CompilationResponse> compile(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @RequestBody CompilationRequest request) throws Exception {
 		Optional<CompilationResponse> out = buildService.build(workspaceID, sessionID, request);
 		
 		return out
@@ -43,7 +42,7 @@ public class BuildAndExecuteRestController {
 	}
 	
 	@PostMapping("/api/workspace/{workspaceID}/sessions/{sessionID}/processes")
-	public ResponseEntity<ExecutionResponse> startExecution(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @RequestBody ExecutionRequest request) {
+	public ResponseEntity<ExecutionResponse> startExecution(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @RequestBody ExecutionRequest request) throws Exception {
 		Optional<UUID> out = executionService.startProcess(workspaceID, sessionID, request);
 		
 		return out
@@ -52,7 +51,7 @@ public class BuildAndExecuteRestController {
 	}
 	
 	@GetMapping("/api/workspace/{workspaceID}/sessions/{sessionID}/processes/{processID}/stdout")
-	public ResponseEntity<byte[]> getProcessStdout(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @PathVariable("processID") UUID processID) {
+	public ResponseEntity<byte[]> getProcessStdout(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @PathVariable("processID") UUID processID) throws Exception {
 		Optional<byte[]> out = executionService.pullProcessStdout(workspaceID, sessionID, processID);
 		
 		return out
@@ -61,7 +60,7 @@ public class BuildAndExecuteRestController {
 	}
 	
 	@GetMapping("/api/workspace/{workspaceID}/sessions/{sessionID}/processes/{processID}/stderr")
-	public ResponseEntity<byte[]> getProcessStderr(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @PathVariable("processID") UUID processID) {
+	public ResponseEntity<byte[]> getProcessStderr(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @PathVariable("processID") UUID processID) throws Exception {
 		Optional<byte[]> err = executionService.pullProcessStderr(workspaceID, sessionID, processID);
 		
 		return err
@@ -69,9 +68,8 @@ public class BuildAndExecuteRestController {
 				.orElseGet(() -> ResponseEntity.notFound().build());	
 	}
 	
-	@SuppressWarnings("rawtypes")
 	@PutMapping("/api/workspace/{workspaceID}/sessions/{sessionID}/processes/{processID}/stdin")
-	public ResponseEntity pushProcessStdin(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @PathVariable("processID") UUID processID, InputStream stream) throws IOException {
+	public ResponseEntity<Void> pushProcessStdin(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @PathVariable("processID") UUID processID, InputStream stream) throws Exception {
 		//Get stream content
 		byte[] content = IOUtils.toByteArray(stream);
 		
@@ -83,15 +81,14 @@ public class BuildAndExecuteRestController {
 	}
 	
 	@GetMapping("/api/workspace/{workspaceID}/sessions/{sessionID}/processes/{processID}/status")
-	public ResponseEntity<ProcessStatusResponse> getProcessStatus(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @PathVariable("processID") UUID processID) {
+	public ResponseEntity<ProcessStatusResponse> getProcessStatus(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @PathVariable("processID") UUID processID) throws Exception {
 		return executionService.getProcessStatus(workspaceID, sessionID, processID)
 				.map(status -> ResponseEntity.ok(status))
 				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
 	
-	@SuppressWarnings("rawtypes")
 	@PutMapping("/api/workspace/{workspaceID}/sessions/{sessionID}/processes/{processID}/status")
-	public ResponseEntity signalProcess(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @PathVariable("processID") UUID processID, @RequestBody SignalProcessRequest request) {
+	public ResponseEntity<Void> signalProcess(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @PathVariable("processID") UUID processID, @RequestBody SignalProcessRequest request) throws Exception{
 		if (executionService.signalProcess(workspaceID, sessionID, processID, request)) {
 			return ResponseEntity.ok().build();
 		} else {

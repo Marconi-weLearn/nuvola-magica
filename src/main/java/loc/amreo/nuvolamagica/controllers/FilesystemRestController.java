@@ -1,6 +1,5 @@
 package loc.amreo.nuvolamagica.controllers;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
@@ -26,9 +25,8 @@ public class FilesystemRestController {
 	@Autowired
 	private FilesystemService filesystemService;
 	
-	@SuppressWarnings("rawtypes")
 	@PutMapping(path="/workspace/{workspaceID}/sessions/{sessionID}/files/**")
-	ResponseEntity putFile(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, HttpServletRequest request, InputStream stream) throws IOException {
+	public ResponseEntity<Void> putFile(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, HttpServletRequest request, InputStream stream) throws Exception {
 		//Get file name
 		String filename = new AntPathMatcher()
 	            .extractPathWithinPattern( "/workspace/{workspaceID}/sessions/{sessionID}/files/**", request.getRequestURI() );
@@ -45,9 +43,8 @@ public class FilesystemRestController {
 		}
 	}
 	
-	@SuppressWarnings("rawtypes")
 	@DeleteMapping(path="/workspace/{workspaceID}/sessions/{sessionID}/files/**")
-	ResponseEntity deleteFile(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, HttpServletRequest request) {
+	public ResponseEntity<Void> deleteFile(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, HttpServletRequest request) throws Exception {
 		//Get file name
 		String filename = new AntPathMatcher()
 	            .extractPathWithinPattern( "/workspace/{workspaceID}/sessions/{sessionID}/files/**", request.getRequestURI() );
@@ -62,7 +59,7 @@ public class FilesystemRestController {
 	}
 	
 	@GetMapping(path="/workspace/{workspaceID}/sessions/{sessionID}/files/**")
-	ResponseEntity<byte[]> getFile(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, HttpServletRequest request) {
+	public ResponseEntity<byte[]> getFile(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, HttpServletRequest request) throws Exception {
 		//Get file name
 		String filename = new AntPathMatcher()
 	            .extractPathWithinPattern( "/workspace/{workspaceID}/sessions/{sessionID}/files/**", request.getRequestURI() );

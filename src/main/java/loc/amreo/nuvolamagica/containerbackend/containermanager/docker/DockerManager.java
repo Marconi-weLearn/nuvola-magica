@@ -31,7 +31,7 @@ public class DockerManager implements ContainerManager {
 	}
 
 	@Override
-	public String createContainer(String containerName) {
+	public String createContainer(String containerName) throws Exception {
 		//Create the container
 		dockerClient.createContainerCmd(CONTAINER_IMAGE)
 				.withName(containerName)
@@ -47,17 +47,17 @@ public class DockerManager implements ContainerManager {
 	}
 
 	@Override
-	public void pause(String containerName) {
+	public void pause(String containerName) throws Exception {
 		dockerClient.pauseContainerCmd(containerName).exec();
 	}
 
 	@Override
-	public void unpause(String containerName) {
+	public void unpause(String containerName) throws Exception {
 		dockerClient.unpauseContainerCmd(containerName).exec();
 	}
 
 	@Override
-	public void destroy(String containerName) {
+	public void destroy(String containerName) throws Exception {
 		dockerClient.removeContainerCmd(containerName).withForce(true).exec();
 	}
 

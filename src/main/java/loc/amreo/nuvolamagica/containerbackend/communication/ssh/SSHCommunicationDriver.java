@@ -54,7 +54,7 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 		this.directoryOfFiles = directoryOfFiles;
 	}
 
-	private SSHClient getConnection(String endpoint) {
+	private SSHClient getConnection(String endpoint) throws Exception {
 		//Check already exist a connection to the endpoint
 		if (connections.containsKey(endpoint)) {
 			//Return the connection
@@ -81,7 +81,7 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 	}
 	
 	@Override
-	public void uploadFile(String communicationEndpoint, String filename, byte[] content) {
+	public void uploadFile(String communicationEndpoint, String filename, byte[] content) throws Exception {
 		SSHClient conn = getConnection(communicationEndpoint);
 		try {
 			//Create empty file with dire
@@ -117,7 +117,7 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 	}
 
 	@Override
-	public void deleteFile(String communicationEndpoint, String filename) {
+	public void deleteFile(String communicationEndpoint, String filename) throws Exception {
 		SSHClient conn = getConnection(communicationEndpoint);
 		try {
 			//Remove the file if exist
@@ -131,7 +131,7 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 	}
 
 	@Override
-	public boolean existFile(String communicationEndpoint, String filename) {
+	public boolean existFile(String communicationEndpoint, String filename) throws Exception {
 		SSHClient conn = getConnection(communicationEndpoint);
 		try {
 			//Check if the file
@@ -148,7 +148,7 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 	}
 
 	@Override
-	public byte[] getFile(String communicationEndpoint, String filename) {
+	public byte[] getFile(String communicationEndpoint, String filename) throws Exception {
 		//It assume the existence of the file
 		SSHClient conn = getConnection(communicationEndpoint);
 		try {
@@ -206,7 +206,7 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 	}
 
 	@Override
-	public CompilationResponse build(String communicationEndpoint, CompilationRequest compilationRequest) {
+	public CompilationResponse build(String communicationEndpoint, CompilationRequest compilationRequest) throws Exception {
 		SSHClient conn = getConnection(communicationEndpoint);
 		try {
 			//Exec the command for building the project
@@ -236,37 +236,37 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 	}
 
 	@Override
-	public UUID startExecution(String communicationEndpoint, ExecutionRequest compilationRequest) {
+	public UUID startExecution(String communicationEndpoint, ExecutionRequest compilationRequest) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public byte[] pullProcessStdout(String communicationEndpoint, UUID processID) {
+	public byte[] pullProcessStdout(String communicationEndpoint, UUID processID) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public byte[] pullProcessStderr(String communicationEndpoint, UUID processID) {
+	public byte[] pullProcessStderr(String communicationEndpoint, UUID processID) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void pushProcessStdin(String communicationEndpoint, UUID processID, byte[] content) {
+	public void pushProcessStdin(String communicationEndpoint, UUID processID, byte[] content) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public ProcessStatusResponse getProcessStatus(String communicationEndpoint, UUID processID) {
+	public ProcessStatusResponse getProcessStatus(String communicationEndpoint, UUID processID) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void sendSignalToProcess(String communicationEndpoint, UUID processID, SignalProcessRequest signalInfo) {
+	public void sendSignalToProcess(String communicationEndpoint, UUID processID, SignalProcessRequest signalInfo) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}

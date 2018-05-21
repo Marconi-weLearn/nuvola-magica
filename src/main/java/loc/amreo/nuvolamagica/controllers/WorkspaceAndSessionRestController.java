@@ -28,12 +28,12 @@ public class WorkspaceAndSessionRestController {
 	private SessionService sessionService;
 	
 	@PostMapping("/workspace")
-	public NewWorkspaceResponse postWorkspace() {
+	public NewWorkspaceResponse postWorkspace() throws Exception {
 		return new NewWorkspaceResponse("/api/workspace/"+workspaceService.createWorkspace().toString());
 	}
 	
 	@PostMapping("/workspace/{workspaceID}/sessions")
-	public ResponseEntity<NewSessionResponse> postWorkspace(@PathVariable("workspaceID") UUID workspaceID ) {
+	public ResponseEntity<NewSessionResponse> postWorkspace(@PathVariable("workspaceID") UUID workspaceID) throws Exception {
 		Optional<UUID> sessionID = sessionService.createSession(workspaceID);
 	
 		return sessionID
@@ -43,7 +43,7 @@ public class WorkspaceAndSessionRestController {
 	}
 	
 	@GetMapping("/workspace/{workspaceID}/sessions/{sessionID}/wakeup")
-	public ResponseEntity<String> getSessionWakeup(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID) {
+	public ResponseEntity<String> getSessionWakeup(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID) throws Exception {
 		if (sessionService.wakeUpSession(workspaceID, sessionID)) {
 			return ResponseEntity.ok("I'M AWAKE!");
 		} else {
@@ -51,9 +51,8 @@ public class WorkspaceAndSessionRestController {
 		}	
 	}
 	
-	@SuppressWarnings("rawtypes")
 	@DeleteMapping("/workspace/{workspaceID}/sessions/{sessionID}")
-	public ResponseEntity deleteSession(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID) {
+	public ResponseEntity<Void> deleteSession(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID) throws Exception {
 		if (sessionService.deleteSession(workspaceID, sessionID)) {
 			return ResponseEntity.ok().build();
 		} else {
@@ -61,10 +60,8 @@ public class WorkspaceAndSessionRestController {
 		}	
 	}
 	
-
-	@SuppressWarnings("rawtypes")
 	@DeleteMapping("/workspace/{workspaceID}")
-	public ResponseEntity deleteWorkspace(@PathVariable("workspaceID") UUID workspaceID ) {
+	public ResponseEntity<Void> deleteWorkspace(@PathVariable("workspaceID") UUID workspaceID) throws Exception {
 		if (workspaceService.deleteWorkspace(workspaceID)) {
 			return ResponseEntity.ok().build();
 		} else {
