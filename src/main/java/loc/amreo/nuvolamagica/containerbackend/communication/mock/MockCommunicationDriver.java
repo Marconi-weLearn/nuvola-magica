@@ -78,6 +78,6 @@ public class MockCommunicationDriver implements CommunicationDriver {
 
 	@Override
 	public void sendSignalToProcess(String communicationEndpoint, UUID processID, SignalProcessRequest signalInfo) throws Exception {
-		System.out.println("[MockCommunicationDriver][sendSignalToProcess] I think the process " + processID + "has received the signal:" + signalInfo.getSignalCode() + " from " + communicationEndpoint);			
+		System.out.println("[MockCommunicationDriver][sendSignalToProcess] I think the process " + processID + "has received the signal:" + signalInfo.getSignal().toString() + " from " + communicationEndpoint);			
 	}
 }

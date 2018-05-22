@@ -16,6 +16,11 @@ public class FooSSHLangDriver implements SSHLangDriver {
 	
 	@Override
 	public String getBuildCommand(String mainFile, String options) {
-		return String.format("bash -c \"echo #!/bin/bash echo %s %s >> out.sh && chmod +x out.sh \"", mainFile, options);
+		return String.format("touch %s.txt", mainFile);
+	}
+
+	@Override
+	public String getExecuteCommand(String filename, String options) {
+		return String.format("rm %s.txt", filename);
 	}
 }

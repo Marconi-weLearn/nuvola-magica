@@ -39,6 +39,7 @@ public class BuildAndExecuteRestController {
 		request.setLangType(null2empty(request.getLangType()));
 		request.setMainFile(null2empty(request.getMainFile()));
 		request.setOptions(null2empty(request.getOptions()));
+		//Build the files
 		Optional<CompilationResponse> out = buildService.build(workspaceID, sessionID, request);
 		
 		return out
@@ -49,6 +50,13 @@ public class BuildAndExecuteRestController {
 	
 	@PostMapping("/api/workspace/{workspaceID}/sessions/{sessionID}/processes")
 	public ResponseEntity<ExecutionResponse> startExecution(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @RequestBody ExecutionRequest request) throws Exception {
+		//Convert all null fields to empty fields
+				request.setChrootDir(null2empty(request.getChrootDir()));
+				request.setLangType(null2empty(request.getLangType()));
+				request.setMainFile(null2empty(request.getMainFile()));
+				request.setOptions(null2empty(request.getOptions()));
+				
+		//Start the process
 		Optional<UUID> out = executionService.startProcess(workspaceID, sessionID, request);
 		
 		return out
