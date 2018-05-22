@@ -221,8 +221,8 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 				return new CompilationResponse(-1, "Language doesn't exist or configured");
 			
 			//Execute the command
-			Command cmd = session.exec(cmdText.get());
-			//outMsg should contain [stdout] + [stderr] + [error message]
+			Command cmd = session.exec("securerun " + compilationRequest.getChrootDir() + " " + cmdText.get());
+			//outMsg should contain [stdout] + [stderr] + error message]
 			cmd.join(1, TimeUnit.SECONDS);
 			String outMsg = IOUtils.toString(cmd.getInputStream()) + IOUtils.toString(cmd.getErrorStream()) + cmd.getExitErrorMessage();
 			session.close();
