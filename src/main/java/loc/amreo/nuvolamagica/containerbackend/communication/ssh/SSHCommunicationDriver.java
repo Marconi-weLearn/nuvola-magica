@@ -204,7 +204,8 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 		logger.info("Building chroot=" + DIRECTORY_OF_FILES+compilationRequest.getChrootDir() + 
 				" lang=" + compilationRequest.getLangType() + " mainFile=" + compilationRequest.getMainFile() + 
 				" options=" + compilationRequest.getOptions() + " endpoint=" + communicationEndpoint);
-
+		compilationRequest.setChrootDir(DIRECTORY_OF_FILES+compilationRequest.getChrootDir());
+		
 		SSHClient conn = getConnection(communicationEndpoint);
 	
 		//Exec the command for building the project
@@ -212,7 +213,7 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 		//TODO: Set chroot
 		//Get the command text
 		Optional<String> cmdText = langDriverRegistry.getBuildCommand(compilationRequest.getLangType(), 
-				DIRECTORY_OF_FILES+compilationRequest.getMainFile(), compilationRequest.getOptions());
+				compilationRequest.getMainFile(), compilationRequest.getOptions());
 		
 		//Check if the language exist
 		if (!cmdText.isPresent())
