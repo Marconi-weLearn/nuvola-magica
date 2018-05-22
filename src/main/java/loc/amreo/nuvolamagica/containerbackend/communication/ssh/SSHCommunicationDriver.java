@@ -25,9 +25,11 @@ import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ExecutionReques
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ProcessStatusResponse;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.SignalProcessRequest;
 import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.connection.channel.direct.Session.Command;
 import net.schmizz.sshj.sftp.SFTPClient;
+import net.schmizz.sshj.transport.TransportException;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.xfer.InMemorySourceFile;
 import net.schmizz.sshj.xfer.LocalDestFile;
@@ -79,19 +81,26 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 		}
 	}
 	
+	
+	private Command simpleExecCommand(Session session, String command, int timeout) throws Exception {
+		//Log the command
+		logger.debug(command);
+		//Execute the command
+		Command cmd = session.exec(command);
+		//Wait the end of the cmd
+		//FIXME: is join blocking?
+		cmd.join(timeout, TimeUnit.SECONDS);
+		//Return it
+		return cmd;
+	}
+	
 	@Override
 	public void uploadFile(String communicationEndpoint, String filename, byte[] content) throws Exception {
 		logger.info("Uploading file filename=" + DIRECTORY_OF_FILES+filename + " endpoint=" + communicationEndpoint + 
 				" content.length=" + content.length);
 		SSHClient conn = getConnection(communicationEndpoint);
-	
-		//Create empty file with dire
-		Session session = conn.startSession();
-		logger.debug("executing on endpoint mkfile " + DIRECTORY_OF_FILES+filename);
-		Command cmd = session.exec("mkfile " + DIRECTORY_OF_FILES+filename);
-		cmd.join(1, TimeUnit.SECONDS);
-		
-		session.close();
+		//Create empty file with directory
+		simpleExecCommand(conn.startSession(), "mkfile " + DIRECTORY_OF_FILES+filename, 1);
 		//Upload the content of the file
 		SFTPClient sftp = conn.newSFTPClient();
 		InMemorySourceFile srcFile = new InMemorySourceFile() {
@@ -119,13 +128,8 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 	@Override
 	public void deleteFile(String communicationEndpoint, String filename) throws Exception {
 		logger.info("Deleting file filename=" + DIRECTORY_OF_FILES+filename + " endpoint=" + communicationEndpoint);
-		SSHClient conn = getConnection(communicationEndpoint);
 		//Remove the file if exist
-		Session session = conn.startSession();
-		logger.debug("executing on endpoint rm -rf " + DIRECTORY_OF_FILES+filename);
-		Command cmd = session.exec("rm -rf " + DIRECTORY_OF_FILES+filename);
-		cmd.join(1, TimeUnit.SECONDS);
-		session.close();
+		simpleExecCommand(getConnection(communicationEndpoint).startSession(), "rm -rf " + DIRECTORY_OF_FILES+filename, 1);
 		logger.info("File deleted");
 	}
 
@@ -133,14 +137,8 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 	public boolean existFile(String communicationEndpoint, String filename) throws Exception {
 		logger.info("Checking the existence of file filename=" + DIRECTORY_OF_FILES+filename + " endpoint=" + communicationEndpoint);
 		SSHClient conn = getConnection(communicationEndpoint);
-		//Check if the file
-		Session session = conn.startSession();
-		logger.debug("executing on endpoint test -f " + DIRECTORY_OF_FILES+filename);
-		Command cmd = session.exec("test -f " + DIRECTORY_OF_FILES+filename);
-		cmd.join(1, TimeUnit.SECONDS);
-		session.close();
-		//When the file exist, test return 0; When the file doesn't exist, test return 1
-		return cmd.getExitStatus() == 0;
+		//Check if the file exist
+		return simpleExecCommand(conn.startSession(), "test -f " + DIRECTORY_OF_FILES+filename, 1).getExitStatus() == 0;
 	}
 
 	@Override
@@ -206,26 +204,18 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 				" options=" + compilationRequest.getOptions() + " endpoint=" + communicationEndpoint);
 		compilationRequest.setChrootDir(DIRECTORY_OF_FILES+compilationRequest.getChrootDir());
 		
-		SSHClient conn = getConnection(communicationEndpoint);
-	
-		//Exec the command for building the project
-		Session session = conn.startSession();
-		//TODO: Set chroot
 		//Get the command text
 		Optional<String> cmdText = langDriverRegistry.getBuildCommand(compilationRequest.getLangType(), 
 				compilationRequest.getMainFile(), compilationRequest.getOptions());
-		
 		//Check if the language exist
-		if (!cmdText.isPresent())
-			return new CompilationResponse(-1, "Language doesn't exist or configured");
-		
+				if (!cmdText.isPresent())
+					return new CompilationResponse(-1, "Language doesn't exist or configured");
+				
 		//Execute the command
-		logger.debug("executing on endpoint securerun " + compilationRequest.getChrootDir() + " " + cmdText.get());
-		Command cmd = session.exec("securerun " + compilationRequest.getChrootDir() + " " + cmdText.get());
-		//outMsg should contain [stdout] + [stderr] + error message]
-		cmd.join(1, TimeUnit.SECONDS);
+		Command cmd = simpleExecCommand(getConnection(communicationEndpoint).startSession() , "securerun " + compilationRequest.getChrootDir() + " " + cmdText.get(), 1);
+		
+		//Get the exist status
 		String outMsg = IOUtils.toString(cmd.getInputStream()) + IOUtils.toString(cmd.getErrorStream()) + cmd.getExitErrorMessage();
-		session.close();
 		logger.debug("build status=" + cmd.getExitStatus());
 
 		//When the file exist, test return 0; When the file doesn't exist, test return 1
