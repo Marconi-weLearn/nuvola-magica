@@ -1,5 +1,6 @@
 package loc.amreo.nuvolamagica.containerbackend.containermanager.docker;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -19,7 +20,7 @@ public class DockerManager implements ContainerManager {
 	private final String CONTAINER_IMAGE;
 	private final String BEM_NETWORK_NAME;
 	private final DockerClient dockerClient;
-	
+	private final Logger logger;
 	
 	public DockerManager(@Value("${nuvolamagica.container.manager.image:nuvola-magica-bem}") String CONTAINER_IMAGE,
 			@Value("${nuvolamagica.container.manager.network:nuvola-magica-bem-network}") String BEM_NETWORK_NAME,
@@ -28,6 +29,7 @@ public class DockerManager implements ContainerManager {
 		this.CONTAINER_IMAGE = CONTAINER_IMAGE;
 		this.dockerClient = dockerClient;
 		this.BEM_NETWORK_NAME = BEM_NETWORK_NAME;
+		this.logger = Logger.getLogger(DockerManager.class);
 	}
 
 	@Override
@@ -43,6 +45,8 @@ public class DockerManager implements ContainerManager {
 		InspectContainerResponse info = dockerClient.inspectContainerCmd(containerName).exec();
 		String port = info.getNetworkSettings().getPorts().getBindings().get(new ExposedPort(22))[0].getHostPortSpec();
 		String ip = info.getNetworkSettings().getNetworks().get(BEM_NETWORK_NAME).getIpAddress();
+		//Logging
+		logger.info("Created container name=" + containerName + " endpoint=" + ip + ":" + port);
 		//Return the endpoint of the container
 		return ip + ":" + port;
 	}
@@ -50,16 +54,19 @@ public class DockerManager implements ContainerManager {
 	@Override
 	public void pause(String containerName) throws Exception {
 		dockerClient.pauseContainerCmd(containerName).exec();
+		logger.info("Paused container name=" + containerName);
 	}
 
 	@Override
 	public void unpause(String containerName) throws Exception {
 		dockerClient.unpauseContainerCmd(containerName).exec();
+		logger.info("Unpaused container name=" + containerName);
 	}
 
 	@Override
 	public void destroy(String containerName) throws Exception {
 		dockerClient.removeContainerCmd(containerName).withForce(true).exec();
+		logger.info("Destroyed container name=" + containerName);
 	}
 
 }
