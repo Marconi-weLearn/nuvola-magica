@@ -32,4 +32,13 @@ public class SSHLangDriverRegistry {
 			return Optional.empty();
 		}
 	}
+
+	public Optional<String> getExecuteCommand(String lang, String filename, String options) {
+		//Check if the lang exist
+		if (drivers.containsKey(lang)) {
+			return Optional.of(drivers.get(lang).getExecuteCommand(filename, options));
+		} else {
+			return Optional.empty();
+		}		
+	}
 }

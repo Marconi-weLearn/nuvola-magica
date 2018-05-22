@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import javax.ws.rs.NotFoundException;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,7 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 	private final String PASSWORD;
 	private final String DIRECTORY_OF_FILES;
 	private final HashMap<String, SSHClient> connections;
+	private final HashMap<UUID, Command> runningCommands;
 	private final Logger logger;
 	
 	public SSHCommunicationDriver(@Autowired SSHLangDriverRegistry langDriverRegistry, 
@@ -53,6 +56,7 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 		this.connections = new HashMap<>();
 		this.DIRECTORY_OF_FILES = DIRECTORY_OF_FILES;
 		this.logger = Logger.getLogger(SSHCommunicationDriver.class);
+		this.runningCommands = new HashMap<>();
 	}
 
 	private SSHClient getConnection(String endpoint) throws Exception {
@@ -204,9 +208,9 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 		Optional<String> cmdText = langDriverRegistry.getBuildCommand(compilationRequest.getLangType(), 
 				compilationRequest.getMainFile(), compilationRequest.getOptions());
 		//Check if the language exist
-				if (!cmdText.isPresent())
-					return new CompilationResponse(-1, "Language doesn't exist or configured");
-				
+		if (!cmdText.isPresent())
+			return new CompilationResponse(-1, "Language doesn't exist or configured");
+		
 		//Execute the command
 		Command cmd = simpleExecCommand(getConnection(communicationEndpoint).startSession() , "securerun " + compilationRequest.getChrootDir() + " " + cmdText.get(), 1);
 		
@@ -220,38 +224,100 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 
 	@Override
 	public UUID startExecution(String communicationEndpoint, ExecutionRequest compilationRequest) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		UUID id = UUID.randomUUID();
+		logger.info("Executing chroot=" + DIRECTORY_OF_FILES+compilationRequest.getChrootDir() + 
+				" lang=" + compilationRequest.getLangType() + " mainFile=" + compilationRequest.getMainFile() + 
+				" options=" + compilationRequest.getOptions() + " endpoint=" + communicationEndpoint);
+		compilationRequest.setChrootDir(DIRECTORY_OF_FILES+compilationRequest.getChrootDir());
+
+		//Get the command text
+		Optional<String> cmdText = langDriverRegistry.getExecuteCommand(compilationRequest.getLangType(), 
+				compilationRequest.getMainFile(), compilationRequest.getOptions());
+		//Check if the language exist
+		if (!cmdText.isPresent()) {
+			throw new Exception("Language doesn't exist or configured");
+		}
+		
+		//Execute the command
+		Command cmd = simpleExecCommand(getConnection(communicationEndpoint).startSession() , "securerun " + compilationRequest.getChrootDir() + " " + cmdText.get(), 0);
+		//Save the command in runningCommands
+		runningCommands.put(id, cmd);
+		
+		return id;
 	}
 
 	@Override
 	public byte[] pullProcessStdout(String communicationEndpoint, UUID processID) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		logger.info("Pulling stdout processID=" + processID + " endpoint=" + communicationEndpoint);
+		//Check if the command is running
+		if (!runningCommands.containsKey(processID)) {
+			throw new NotFoundException("Command not found");
+		}
+		
+		//Get the command
+		Command cmd = runningCommands.get(processID);
+		
+		//FIXME: check if the inputStream == stdout of the process
+		return IOUtils.toByteArray(cmd.getInputStream());
 	}
 
 	@Override
 	public byte[] pullProcessStderr(String communicationEndpoint, UUID processID) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		logger.info("Pulling stderr processID=" + processID + " endpoint=" + communicationEndpoint);
+		//Check if the command is running
+		if (!runningCommands.containsKey(processID)) {
+			throw new NotFoundException("Command not found");
+		}
+		
+		//Get the command
+		Command cmd = runningCommands.get(processID);
+		
+		//FIXME: check if the inputStream == stdout of the process
+		return IOUtils.toByteArray(cmd.getErrorStream());
 	}
 
 	@Override
 	public void pushProcessStdin(String communicationEndpoint, UUID processID, byte[] content) throws Exception {
-		// TODO Auto-generated method stub
+		logger.info("Pushing stdin processID=" + processID + " content.length=" + content.length + " endpoint=" + communicationEndpoint);
+		//Check if the command is running
+		if (!runningCommands.containsKey(processID)) {
+			throw new NotFoundException("Command not found");
+		}
 		
+		//Get the command
+		Command cmd = runningCommands.get(processID);
+		
+		//Write the content to the stdin?
+		cmd.getOutputStream().write(content);
 	}
 
 	@Override
 	public ProcessStatusResponse getProcessStatus(String communicationEndpoint, UUID processID) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		logger.info("Getting process status processID=" + processID + " endpoint=" + communicationEndpoint);
+		//Check if the command is running
+		if (!runningCommands.containsKey(processID)) {
+			throw new NotFoundException("Command not found");
+		}
+		
+		//Get the command
+		Command cmd = runningCommands.get(processID);
+		
+		return new ProcessStatusResponse(cmd.getExitStatus(), cmd.getExitErrorMessage());
+	
 	}
 
 	@Override
 	public void sendSignalToProcess(String communicationEndpoint, UUID processID, SignalProcessRequest signalInfo) throws Exception {
-		// TODO Auto-generated method stub
+		logger.info("Sending signal to process processID=" + processID + " signal=" + signalInfo.getSignal() + " endpoint=" + communicationEndpoint);
+		//Check if the command is running
+		if (!runningCommands.containsKey(processID)) {
+			throw new NotFoundException("Command not found");
+		}
 		
+		//Get the command
+		Command cmd = runningCommands.get(processID);
+	
+		cmd.signal(signalInfo.getSignal());
 	}
 
 }

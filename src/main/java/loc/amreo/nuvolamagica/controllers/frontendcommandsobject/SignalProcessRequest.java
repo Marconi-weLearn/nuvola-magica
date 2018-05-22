@@ -1,14 +1,16 @@
 package loc.amreo.nuvolamagica.controllers.frontendcommandsobject;
 
-public class SignalProcessRequest {
-	private int signalCode;
+import net.schmizz.sshj.connection.channel.direct.Signal;
 
-	public int getSignalCode() {
-		return signalCode;
+public class SignalProcessRequest {
+	private Signal signal;
+
+	public Signal getSignal() {
+		return signal;
 	}
 
-	public void setSignalCode(int signalCode) {
-		this.signalCode = signalCode;
+	public void setSignal(Signal signal) {
+		this.signal= signal;
 	}
 	
 }
