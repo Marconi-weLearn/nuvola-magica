@@ -43,12 +43,11 @@ public class DockerManager implements ContainerManager {
 		dockerClient.startContainerCmd(containerName).exec();
 		//Get the infos
 		InspectContainerResponse info = dockerClient.inspectContainerCmd(containerName).exec();
-		String port = info.getNetworkSettings().getPorts().getBindings().get(new ExposedPort(22))[0].getHostPortSpec();
 		String ip = info.getNetworkSettings().getNetworks().get(BEM_NETWORK_NAME).getIpAddress();
 		//Logging
-		logger.info("Created container name=" + containerName + " endpoint=" + ip + ":" + port);
+		logger.info("Created container name=" + containerName + " endpoint=" + ip + ":22");
 		//Return the endpoint of the container
-		return ip + ":" + port;
+		return ip + ":22";
 	}
 
 	@Override
