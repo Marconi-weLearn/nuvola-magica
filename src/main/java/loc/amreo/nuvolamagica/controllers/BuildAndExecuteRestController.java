@@ -22,6 +22,7 @@ import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ProcessStatusRe
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.SignalProcessRequest;
 import loc.amreo.nuvolamagica.services.BuildService;
 import loc.amreo.nuvolamagica.services.ExecutionService;
+import static loc.amreo.nuvolamagica.Utils.null2empty;
 
 @RestController
 public class BuildAndExecuteRestController {
@@ -33,6 +34,11 @@ public class BuildAndExecuteRestController {
 	
 	@PostMapping("/api/workspace/{workspaceID}/sessions/{sessionID}/compilation")
 	public ResponseEntity<CompilationResponse> compile(@PathVariable("workspaceID") UUID workspaceID, @PathVariable("sessionID") UUID sessionID, @RequestBody CompilationRequest request) throws Exception {
+		//Convert all null fields to empty fields
+		request.setChrootDir(null2empty(request.getChrootDir()));
+		request.setLangType(null2empty(request.getLangType()));
+		request.setMainFile(null2empty(request.getMainFile()));
+		request.setOptions(null2empty(request.getOptions()));
 		Optional<CompilationResponse> out = buildService.build(workspaceID, sessionID, request);
 		
 		return out
