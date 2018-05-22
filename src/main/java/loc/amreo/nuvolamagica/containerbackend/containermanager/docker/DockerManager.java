@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InspectContainerResponse;
-import com.github.dockerjava.api.model.ExposedPort;
 
 import loc.amreo.nuvolamagica.containerbackend.ContainerManager;
 

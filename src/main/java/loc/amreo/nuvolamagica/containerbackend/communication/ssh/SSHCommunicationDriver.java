@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -36,25 +37,28 @@ import net.schmizz.sshj.xfer.LocalDestFile;
 public class SSHCommunicationDriver implements CommunicationDriver {
 
 	private final SSHLangDriverRegistry langDriverRegistry;
-	private final String username;
-	private final String password;
-	private final String directoryOfFiles;
+	private final String USERNAME;
+	private final String PASSWORD;
+	private final String DIRECTORY_OF_FILES;
 	private final HashMap<String, SSHClient> connections;
-	
+	private final Logger logger;
 	
 	public SSHCommunicationDriver(@Autowired SSHLangDriverRegistry langDriverRegistry, 
-			@Value("${nuvolamagica.communication.username:root}") String username,
-			@Value("${nuvolamagica.communication.password:password}") String password,
-			@Value("${nuvolamagica.communication.ssh.directory_of_files:/var/nuvolamagica/}") String directoryOfFiles) {
+			@Value("${nuvolamagica.communication.username:root}") String USERNAME,
+			@Value("${nuvolamagica.communication.password:password}") String PASSWORD,
+			@Value("${nuvolamagica.communication.ssh.directory_of_files:/var/nuvolamagica/}") String DIRECTORY_OF_FILES) {
 		super();
 		this.langDriverRegistry = langDriverRegistry;
-		this.username = username;
-		this.password = password;
+		this.USERNAME = USERNAME;
+		this.PASSWORD = PASSWORD;
 		this.connections = new HashMap<>();
-		this.directoryOfFiles = directoryOfFiles;
+		this.DIRECTORY_OF_FILES = DIRECTORY_OF_FILES;
+		this.logger = Logger.getLogger(SSHCommunicationDriver.class);
 	}
 
 	private SSHClient getConnection(String endpoint) throws Exception {
+		//Log
+		logger.info("Getting connection endpoint=" + endpoint);
 		//Check already exist a connection to the endpoint
 		if (connections.containsKey(endpoint)) {
 			//Return the connection
@@ -66,15 +70,10 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 			String hostname = endpoint.substring(0, endpoint.indexOf(":"));
 			int port = Integer.parseInt(endpoint.substring(endpoint.indexOf(":")+1));
 			//Connect to the container
-			try {
-				newconn.addHostKeyVerifier(new PromiscuousVerifier());
-				newconn.connect(hostname, port);
-				newconn.authPassword(username, password);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			newconn.addHostKeyVerifier(new PromiscuousVerifier());
+			newconn.connect(hostname, port);
+			newconn.authPassword(USERNAME, PASSWORD);
 			connections.put(endpoint, newconn);
-			
 			//Return the connection
 			return newconn;
 		}
@@ -82,157 +81,154 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 	
 	@Override
 	public void uploadFile(String communicationEndpoint, String filename, byte[] content) throws Exception {
+		logger.info("Uploading file filename=" + DIRECTORY_OF_FILES+filename + " endpoint=" + communicationEndpoint + 
+				" content.length=" + content.length);
 		SSHClient conn = getConnection(communicationEndpoint);
-		try {
-			//Create empty file with dire
-			Session session = conn.startSession();
-			Command cmd = session.exec("mkfile " + directoryOfFiles+filename);
-			cmd.join(1, TimeUnit.SECONDS);
+	
+		//Create empty file with dire
+		Session session = conn.startSession();
+		logger.debug("executing on endpoint mkfile " + DIRECTORY_OF_FILES+filename);
+		Command cmd = session.exec("mkfile " + DIRECTORY_OF_FILES+filename);
+		cmd.join(1, TimeUnit.SECONDS);
+		
+		session.close();
+		//Upload the content of the file
+		SFTPClient sftp = conn.newSFTPClient();
+		InMemorySourceFile srcFile = new InMemorySourceFile() {
 			
-			session.close();
-			//Upload the content of the file
-			SFTPClient sftp = conn.newSFTPClient();
-			InMemorySourceFile srcFile = new InMemorySourceFile() {
-				
-				@Override
-				public String getName() {
-					return filename;
-				}
-				
-				@Override
-				public long getLength() {
-					return content.length;
-				}
-				
-				@Override
-				public InputStream getInputStream() throws IOException {
-					return new ByteArrayInputStream(content);
-				}
-			};
+			@Override
+			public String getName() {
+				return filename;
+			}
 			
-			sftp.put(srcFile, directoryOfFiles+filename);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}	
+			@Override
+			public long getLength() {
+				return content.length;
+			}
+			
+			@Override
+			public InputStream getInputStream() throws IOException {
+				return new ByteArrayInputStream(content);
+			}
+		};
+		
+		sftp.put(srcFile, DIRECTORY_OF_FILES+filename);	
+		logger.info("File uploaded");
 	}
 
 	@Override
 	public void deleteFile(String communicationEndpoint, String filename) throws Exception {
+		logger.info("Deleting file filename=" + DIRECTORY_OF_FILES+filename + " endpoint=" + communicationEndpoint);
 		SSHClient conn = getConnection(communicationEndpoint);
-		try {
-			//Remove the file if exist
-			Session session = conn.startSession();
-			Command cmd = session.exec("rm -rf " + directoryOfFiles+filename);
-			cmd.join(1, TimeUnit.SECONDS);
-			session.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}			
+		//Remove the file if exist
+		Session session = conn.startSession();
+		logger.debug("executing on endpoint rm -rf " + DIRECTORY_OF_FILES+filename);
+		Command cmd = session.exec("rm -rf " + DIRECTORY_OF_FILES+filename);
+		cmd.join(1, TimeUnit.SECONDS);
+		session.close();
+		logger.info("File deleted");
 	}
 
 	@Override
 	public boolean existFile(String communicationEndpoint, String filename) throws Exception {
+		logger.info("Checking the existence of file filename=" + DIRECTORY_OF_FILES+filename + " endpoint=" + communicationEndpoint);
 		SSHClient conn = getConnection(communicationEndpoint);
-		try {
-			//Check if the file
-			Session session = conn.startSession();
-			Command cmd = session.exec("test -f " + directoryOfFiles+filename);
-			cmd.join(1, TimeUnit.SECONDS);
-			session.close();
-			//When the file exist, test return 0; When the file doesn't exist, test return 1
-			return cmd.getExitStatus() == 0;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}			
+		//Check if the file
+		Session session = conn.startSession();
+		logger.debug("executing on endpoint test -f " + DIRECTORY_OF_FILES+filename);
+		Command cmd = session.exec("test -f " + DIRECTORY_OF_FILES+filename);
+		cmd.join(1, TimeUnit.SECONDS);
+		session.close();
+		//When the file exist, test return 0; When the file doesn't exist, test return 1
+		return cmd.getExitStatus() == 0;
 	}
 
 	@Override
 	public byte[] getFile(String communicationEndpoint, String filename) throws Exception {
+		logger.info("Getting the file filename=" + DIRECTORY_OF_FILES+filename + " endpoint=" + communicationEndpoint);
 		//It assume the existence of the file
 		SSHClient conn = getConnection(communicationEndpoint);
-		try {
-			//Create the SFTP client
-			SFTPClient sftp = conn.newSFTPClient();
-			//Create the output stream
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			LocalDestFile remote = new LocalDestFile() {
-				
-				@Override
-				public void setPermissions(int arg0) throws IOException {
-					//Nothing
-				}
-				
-				@Override
-				public void setLastModifiedTime(long arg0) throws IOException {
-					//Nothing
-				}
-				
-				@Override
-				public void setLastAccessedTime(long arg0) throws IOException {
-					//Nothing
-				}
-				
-				@Override
-				public LocalDestFile getTargetFile(String arg0) throws IOException {
-					//I don't know why but i can't return null. Why is there this method?
-					return this;
-				}
-				
-				@Override
-				public LocalDestFile getTargetDirectory(String arg0) throws IOException {
-					//I don't know why but i can't return null. Why is there this method?
-					return this;
-				}
-				
-				@Override
-				public OutputStream getOutputStream() throws IOException {
-					return out;
-				}
-				
-				@Override
-				public LocalDestFile getChild(String arg0) {
-					return null;
-				}
-			};
-			//Download the file
-			sftp.get(directoryOfFiles+filename, remote);
-			//Extract the bytes from the byte array
-			return out.toByteArray();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return new byte[0];
-		}	
+	
+		//Create the SFTP client
+		SFTPClient sftp = conn.newSFTPClient();
+		//Create the output stream
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		LocalDestFile remote = new LocalDestFile() {
+			
+			@Override
+			public void setPermissions(int arg0) throws IOException {
+				//Nothing
+			}
+			
+			@Override
+			public void setLastModifiedTime(long arg0) throws IOException {
+				//Nothing
+			}
+			
+			@Override
+			public void setLastAccessedTime(long arg0) throws IOException {
+				//Nothing
+			}
+			
+			@Override
+			public LocalDestFile getTargetFile(String arg0) throws IOException {
+				//I don't know why but i can't return null. Why is there this method?
+				return this;
+			}
+			
+			@Override
+			public LocalDestFile getTargetDirectory(String arg0) throws IOException {
+				//I don't know why but i can't return null. Why is there this method?
+				return this;
+			}
+			
+			@Override
+			public OutputStream getOutputStream() throws IOException {
+				return out;
+			}
+			
+			@Override
+			public LocalDestFile getChild(String arg0) {
+				return null;
+			}
+		};
+		//Download the file
+		sftp.get(DIRECTORY_OF_FILES+filename, remote);
+		logger.info("File getted size=" + out.size());
+		//Extract the bytes from the byte array
+		return out.toByteArray();
 	}
 
 	@Override
 	public CompilationResponse build(String communicationEndpoint, CompilationRequest compilationRequest) throws Exception {
+		logger.info("Building chroot=" + DIRECTORY_OF_FILES+compilationRequest.getChrootDir() + 
+				" lang=" + compilationRequest.getLangType() + " mainFile=" + compilationRequest.getMainFile() + 
+				" options=" + compilationRequest.getOptions() + " endpoint=" + communicationEndpoint);
+
 		SSHClient conn = getConnection(communicationEndpoint);
-		try {
-			//Exec the command for building the project
-			Session session = conn.startSession();
-			//TODO: Set chroot
-			//Get the command text
-			Optional<String> cmdText = langDriverRegistry.getBuildCommand(compilationRequest.getLangType(), 
-					directoryOfFiles+compilationRequest.getMainFile(), compilationRequest.getOptions());
-			
-			//Check if the language exist
-			if (!cmdText.isPresent())
-				return new CompilationResponse(-1, "Language doesn't exist or configured");
-			
-			//Execute the command
-			Command cmd = session.exec("securerun " + compilationRequest.getChrootDir() + " " + cmdText.get());
-			//outMsg should contain [stdout] + [stderr] + error message]
-			cmd.join(1, TimeUnit.SECONDS);
-			String outMsg = IOUtils.toString(cmd.getInputStream()) + IOUtils.toString(cmd.getErrorStream()) + cmd.getExitErrorMessage();
-			session.close();
-			
-			//When the file exist, test return 0; When the file doesn't exist, test return 1
-			return new CompilationResponse(cmd.getExitStatus(), outMsg);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return new CompilationResponse(-1, "Build failed because " + e.getMessage());
-		}	
+	
+		//Exec the command for building the project
+		Session session = conn.startSession();
+		//TODO: Set chroot
+		//Get the command text
+		Optional<String> cmdText = langDriverRegistry.getBuildCommand(compilationRequest.getLangType(), 
+				DIRECTORY_OF_FILES+compilationRequest.getMainFile(), compilationRequest.getOptions());
+		
+		//Check if the language exist
+		if (!cmdText.isPresent())
+			return new CompilationResponse(-1, "Language doesn't exist or configured");
+		
+		//Execute the command
+		logger.debug("executing on endpoint securerun " + compilationRequest.getChrootDir() + " " + cmdText.get());
+		Command cmd = session.exec("securerun " + compilationRequest.getChrootDir() + " " + cmdText.get());
+		//outMsg should contain [stdout] + [stderr] + error message]
+		cmd.join(1, TimeUnit.SECONDS);
+		String outMsg = IOUtils.toString(cmd.getInputStream()) + IOUtils.toString(cmd.getErrorStream()) + cmd.getExitErrorMessage();
+		session.close();
+		logger.debug("build status=" + cmd.getExitStatus());
+
+		//When the file exist, test return 0; When the file doesn't exist, test return 1
+		return new CompilationResponse(cmd.getExitStatus(), outMsg);
 	}
 
 	@Override
