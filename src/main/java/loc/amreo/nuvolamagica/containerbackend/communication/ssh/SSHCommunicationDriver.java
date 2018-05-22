@@ -16,20 +16,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
-
-
 import loc.amreo.nuvolamagica.containerbackend.CommunicationDriver;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.CompilationRequest;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.CompilationResponse;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ExecutionRequest;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.ProcessStatusResponse;
 import loc.amreo.nuvolamagica.controllers.frontendcommandsobject.SignalProcessRequest;
+import static loc.amreo.nuvolamagica.Utils.null2empty;
 import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.connection.channel.direct.Session.Command;
 import net.schmizz.sshj.sftp.SFTPClient;
-import net.schmizz.sshj.transport.TransportException;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.xfer.InMemorySourceFile;
 import net.schmizz.sshj.xfer.LocalDestFile;
@@ -80,8 +77,7 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 			return newconn;
 		}
 	}
-	
-	
+		
 	private Command simpleExecCommand(Session session, String command, int timeout) throws Exception {
 		//Log the command
 		logger.debug(command);
@@ -215,7 +211,7 @@ public class SSHCommunicationDriver implements CommunicationDriver {
 		Command cmd = simpleExecCommand(getConnection(communicationEndpoint).startSession() , "securerun " + compilationRequest.getChrootDir() + " " + cmdText.get(), 1);
 		
 		//Get the exist status
-		String outMsg = IOUtils.toString(cmd.getInputStream()) + IOUtils.toString(cmd.getErrorStream()) + cmd.getExitErrorMessage();
+		String outMsg = null2empty(IOUtils.toString(cmd.getInputStream())) + " " + null2empty(IOUtils.toString(cmd.getErrorStream())) + " " + null2empty(cmd.getExitErrorMessage());
 		logger.debug("build status=" + cmd.getExitStatus());
 
 		//When the file exist, test return 0; When the file doesn't exist, test return 1
