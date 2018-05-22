@@ -18,16 +18,19 @@ public class DockerManager implements ContainerManager {
 	//It contain the name of the image that will be used to create the containers
 	private final String CONTAINER_IMAGE;
 	private final String COMMUNICATION_ENDPOINT_IP;
+	private final String BEM_NETWORK_NAME;
 	private final DockerClient dockerClient;
 	
 	
 	public DockerManager(@Value("${nuvolamagica.container.manager.image:nuvola-magica-bem}") String CONTAINER_IMAGE,
 			@Value("${nuvolamagica.container.manager.communication-endpoint-ip:127.0.0.1}") String COMMUNICATION_ENDPOINT_IP,
+			@Value("${nuvolamagica.container.manager.network:nuvola-magica-bem-network}") String BEM_NETWORK_NAME,
 			@Autowired DockerClient dockerClient) {
 		super();
 		this.CONTAINER_IMAGE = CONTAINER_IMAGE;
 		this.COMMUNICATION_ENDPOINT_IP = COMMUNICATION_ENDPOINT_IP;
 		this.dockerClient = dockerClient;
+		this.BEM_NETWORK_NAME = BEM_NETWORK_NAME;
 	}
 
 	@Override
@@ -36,6 +39,7 @@ public class DockerManager implements ContainerManager {
 		dockerClient.createContainerCmd(CONTAINER_IMAGE)
 				.withName(containerName)
 				.withPublishAllPorts(true)
+				.withNetworkMode(BEM_NETWORK_NAME)
 				.exec();
 		dockerClient.startContainerCmd(containerName).exec();
 		//Get the infos
