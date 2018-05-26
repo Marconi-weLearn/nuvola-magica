@@ -19,9 +19,8 @@ public class JavaSSHLangDriver implements SSHLangDriver {
 		return "javac " + options + " " + mainFile;
 	}
 
-	@Override
 	public String getExecuteCommand(String filename, String options) {
-		return "java " + options + " " + filename ;
+		return "java " + options + " " + filename.replace(".java", "") ;
 	}
 
 }
