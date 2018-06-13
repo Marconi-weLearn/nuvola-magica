@@ -10,6 +10,7 @@ There is a configuration file called ```application.properties``` in ```src/main
 ```bash
 git clone https://github.com/marconi-welearn/nuvola-magica.git
 cd nuvola-magica
+mvn package
 docker build -t nuvola-magica:latest .
 cd bem
 docker build -t nuvola-magica-bem:latest .
