@@ -15,6 +15,6 @@ docker build -t nuvola-magica:latest .
 cd bem
 docker build -t nuvola-magica-bem:latest .
 docker network create nuvola-magica-bem-network
-docker run -dp 8081:8080 --name nuvola-magica nuvola-magica:latest
+docker run -dp 8082:8080 --name nuvola-magica -v /var/run/docker.sock:/var/run/docker.sock nuvola-magica:latest
 docker network connect nuvola-magica-bem-network nuvola-magica
 ```
